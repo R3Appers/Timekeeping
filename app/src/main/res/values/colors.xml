@@ -10,5 +10,11 @@
     // Log Colors
     <color name="colorGray">#DDDDDD</color>
     <color name="colorDarkGray">#AAAAAA</color>
+
+    <color name="tabColorA">#AAAAAA</color>
+    <color name="tabTextColorA">#FF3366</color>
+
+    <color name="tabColorB">#AAAAAA</color>
+    <color name="tabTextColorB">#33FF66</color>
     // End of Log Colors
 </resources>

@@ -1,5 +1,6 @@
 package com.rrreyes.prototype.timekeeping.Adapters;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,8 +20,10 @@ import java.util.List;
 public class MainLogAdapter extends RecyclerView.Adapter<MainLogAdapter.MainLogViewHolder> {
 
     private List<DTRDataSorted> dtrDataList = new ArrayList<>();
+    private Context context;
 
-    public MainLogAdapter(List<DTRDataSorted> data) {
+    public MainLogAdapter(Context context, List<DTRDataSorted> data) {
+        this.context = context;
         this.dtrDataList = data;
     }
 
@@ -37,21 +40,25 @@ public class MainLogAdapter extends RecyclerView.Adapter<MainLogAdapter.MainLogV
         holder.TV_EmpIDN.setText(data.getBarcode());
         if(data.getTimeIn() != null) {
             holder.TV_TimeIn.setText(data.getTimeIn());
+            holder.TV_TimeIn.setTextColor(context.getResources().getColor(R.color.tabTextColorB));
         } else {
             holder.TV_TimeIn.setText("**:**");
         }
         if(data.getTimeOut() != null) {
             holder.TV_TimeOut.setText(data.getTimeOut());
+            holder.TV_TimeOut.setTextColor(context.getResources().getColor(R.color.tabTextColorA));
         } else {
             holder.TV_TimeOut.setText("**:**");
         }
         if(data.getBreakOut() != null) {
             holder.TV_BreakOut.setText(data.getBreakOut());
+            holder.TV_BreakOut.setTextColor(context.getResources().getColor(R.color.tabTextColorA));
         } else {
             holder.TV_BreakOut.setText("**:**");
         }
-        if(data.getBreakOut() != null) {
+        if(data.getBreakIn() != null) {
             holder.TV_BreakIn.setText(data.getBreakIn());
+            holder.TV_BreakIn.setTextColor(context.getResources().getColor(R.color.tabTextColorB));
         } else {
             holder.TV_BreakIn.setText("**:**");
         }

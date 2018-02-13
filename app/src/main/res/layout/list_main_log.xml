@@ -42,6 +42,7 @@
             android:text="@string/placeholder"
             android:textSize="18sp"
             android:textColor="@color/colorBlack"
+            android:textStyle="bold"
             android:layout_margin="2dp"
             android:background="@color/colorDarkGray"/>
 
@@ -61,6 +62,7 @@
             android:textSize="16sp"
             android:textColor="@color/colorBlack"
             android:layout_margin="2dp"
+            android:textStyle="bold"
             android:background="@color/colorDarkGray"/>
 
         <TextView
@@ -72,6 +74,7 @@
             android:textSize="16sp"
             android:textColor="@color/colorBlack"
             android:layout_margin="2dp"
+            android:textStyle="bold"
             android:background="@color/colorDarkGray"/>
 
         <TextView
@@ -83,6 +86,7 @@
             android:textSize="16sp"
             android:textColor="@color/colorBlack"
             android:layout_margin="2dp"
+            android:textStyle="bold"
             android:background="@color/colorDarkGray"/>
 
         <TextView
@@ -94,6 +98,7 @@
             android:textSize="16sp"
             android:textColor="@color/colorBlack"
             android:layout_margin="2dp"
+            android:textStyle="bold"
             android:background="@color/colorDarkGray"/>
 
     </LinearLayout>

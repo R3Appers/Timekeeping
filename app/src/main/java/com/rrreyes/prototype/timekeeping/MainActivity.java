@@ -167,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
                             .endGroup()
                             .findAll();
                     DTRDataSorter dtrSorter = new DTRDataSorter();
-                    MLAdapter = new MainLogAdapter(dtrSorter.SortData(dataList));
+                    MLAdapter = new MainLogAdapter(getApplicationContext(), dtrSorter.SortData(dataList));
                     LinearLayoutManager LLManager = new LinearLayoutManager(getApplicationContext());
                     LLManager.setOrientation(LinearLayoutManager.VERTICAL);
                     LLManager.setStackFromEnd(false);

@@ -9,6 +9,15 @@
     android:background="@color/colorPrimary"
     tools:context=".ScanActivity">
 
+    <TextView
+        android:id="@+id/TV_Status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/placeholder"
+        android:textSize="18sp"
+        android:textColor="@color/colorWhite"
+        android:textStyle="bold"/>
+
     <SurfaceView
         android:id="@+id/Camera_QR"
         android:layout_width="match_parent"

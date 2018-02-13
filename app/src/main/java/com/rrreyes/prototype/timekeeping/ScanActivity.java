@@ -36,7 +36,7 @@ public class ScanActivity extends AppCompatActivity {
 
     Activity thisActivity = this;
     SurfaceView QRScanner;
-    TextView TV_QRInfo;
+    TextView TV_QRInfo, TV_Status;
     Button Btn_ForgotID;
 
     BarcodeDetector barcodeDetector;
@@ -70,6 +70,7 @@ public class ScanActivity extends AppCompatActivity {
 
         QRScanner = findViewById(R.id.Camera_QR);
         TV_QRInfo = findViewById(R.id.TV_QRInfo);
+        TV_Status = findViewById(R.id.TV_Status);
         Btn_ForgotID = findViewById(R.id.Btn_ForgotID);
 
         barcodeDetector = new BarcodeDetector.Builder(this)
@@ -88,6 +89,25 @@ public class ScanActivity extends AppCompatActivity {
     }
 
     void InitViews() {
+        switch (TimeType) {
+            case 1 :
+                TV_Status.setText(R.string.timein);
+                TV_Status.setTextColor(getResources().getColor(R.color.tabTextColorB));
+                break;
+            case 2 :
+                TV_Status.setText(R.string.breakout);
+                TV_Status.setTextColor(getResources().getColor(R.color.tabTextColorA));
+                break;
+            case 3 :
+                TV_Status.setText(R.string.breakin);
+                TV_Status.setTextColor(getResources().getColor(R.color.tabTextColorB));
+                break;
+            case 4 :
+                TV_Status.setText(R.string.timeout);
+                TV_Status.setTextColor(getResources().getColor(R.color.tabTextColorA));
+                break;
+        }
+
         Btn_ForgotID.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

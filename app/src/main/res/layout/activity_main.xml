@@ -40,18 +40,24 @@
         android:background="@color/colorWhite"/>
 
     <LinearLayout
+        android:id="@+id/BtnLayout_Ins"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toTopOf="@+id/BtnLayout_Outs">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
 
         <LinearLayout
             android:id="@+id/Btn_TimeIn"
             android:layout_width="0dp"
-            android:layout_height="100dp"
-            android:layout_weight="1"
-            android:layout_margin="8dp"
-            android:background="@color/colorWhite"
+            android:layout_height="50dp"
+            android:layout_weight="12"
+            android:layout_margin="2dp"
+            android:background="@drawable/btn_drawable_rounded_green"
             android:onClick="Btn_Click">
 
             <TextView
@@ -68,34 +74,12 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/Btn_BreakOut"
-            android:layout_width="0dp"
-            android:layout_height="100dp"
-            android:layout_weight="1"
-            android:layout_margin="8dp"
-            android:background="@color/colorWhite"
-            android:onClick="Btn_Click">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/breakout"
-                android:textAlignment="center"
-                android:textColor="@color/colorBlack"
-                android:textSize="16sp"
-                android:textAllCaps="true"
-                android:textStyle="bold"/>
-
-        </LinearLayout>
-
-        <LinearLayout
             android:id="@+id/Btn_BreakIn"
             android:layout_width="0dp"
-            android:layout_height="100dp"
-            android:layout_weight="1"
-            android:layout_margin="8dp"
-            android:background="@color/colorWhite"
+            android:layout_height="50dp"
+            android:layout_weight="12"
+            android:layout_margin="2dp"
+            android:background="@drawable/btn_drawable_rounded_green"
             android:onClick="Btn_Click">
 
             <TextView
@@ -112,12 +96,54 @@
         </LinearLayout>
 
         <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/BtnLayout_Outs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+
+        <LinearLayout
+            android:id="@+id/Btn_BreakOut"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="12"
+            android:layout_margin="2dp"
+            android:background="@drawable/btn_drawable_rounded_red"
+            android:onClick="Btn_Click">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/breakout"
+                android:textAlignment="center"
+                android:textColor="@color/colorBlack"
+                android:textSize="16sp"
+                android:textAllCaps="true"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/Btn_TimeOut"
             android:layout_width="0dp"
-            android:layout_height="100dp"
-            android:layout_weight="1"
-            android:layout_margin="8dp"
-            android:background="@color/colorWhite"
+            android:layout_height="50dp"
+            android:layout_weight="12"
+            android:layout_margin="2dp"
+            android:background="@drawable/btn_drawable_rounded_red"
             android:onClick="Btn_Click">
 
             <TextView
@@ -132,6 +158,26 @@
                 android:textStyle="bold"/>
 
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="25dp"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="@+id/BtnLayout_Outs">
+
+        <ImageView
+            android:layout_width="92dp"
+            android:layout_height="64dp"
+            android:src="@mipmap/ic_logo"
+            android:background="@drawable/background_oval_white"/>
 
     </LinearLayout>
 
