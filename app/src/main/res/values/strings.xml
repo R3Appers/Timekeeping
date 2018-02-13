@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">Timekeeping</string>
+    <string name="breakin">Break In</string>
+    <string name="breakout">Break Out</string>
+    <string name="timein">Time In</string>
+    <string name="timeout">Time Out</string>
+    <string name="settings">Settings</string>
+    <string name="branchid">Branch ID</string>
+    <string name="syncdata">Sync Data</string>
+    <string name="login">Login</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="setup">Setup</string>
+    <string name="ok">OK</string>
+    <string name="startdate">Start Date</string>
+    <string name="enddate">End Date</string>
+    <string name="senddtr">Send DTR</string>
+    <string name="logout">Log Out</string>
+    <string name="forgotid">Forgot your ID?</string>
+    <string name="idnum">Employee ID Number</string>
+    <string name="clockin">Clock In</string>
+    <string name="confirm">Confirm</string>
+    <string name="confirmlog">Confirm Log</string>
+    <string name="initial">Tap the Settings Icon to Configure the App.</string>
+    <string name="takepic">Ready to Take a Selfie? Tap to Continue.</string>
+    <string name="scanidhere">Scan your ID here</string>
+    <string name="dtrlogdata">DATE | EMPLOYEE ID | STATUS</string>
+    <string name="placeholder">**********</string>
+</resources>
