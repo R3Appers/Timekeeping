@@ -185,62 +185,6 @@ public class CameraActivity extends AppCompatActivity {
                         }
                     }
                     ProcessImage(imgList);
-                } else if(mType.equals("1")) {
-                    String dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/Timekeeping/";
-                    List<Bitmap> imgList = new ArrayList<>();
-                    for(int i = 1; i < 5; i++) {
-                        File image = new File(dir + mBarcode + "_" + mDate + "_" + i + ".png");
-                        if(image.exists()) {
-                            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-                            Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath(), bmOptions);
-                            imgList.add(bitmap);
-                        } else {
-                            image = new File(dir + mBarcode + "_" + mDate + "_" + 1 + ".png");
-                            if(image.exists()) {
-                                BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-                                Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath(), bmOptions);
-                                if(bitmap != null) {
-                                    imgList.add(CreateBlankImage(bitmap.getWidth(), bitmap.getHeight()));
-                                } else {
-                                    imgList.add(CreateBlankImage(248, 248));
-                                }
-                            } else {
-                                image = new File(dir + mBarcode + "_" + mDate + "_" + 2 + ".png");
-                                if(image.exists()) {
-                                    BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-                                    Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath(), bmOptions);
-                                    if(bitmap != null) {
-                                        imgList.add(CreateBlankImage(bitmap.getWidth(), bitmap.getHeight()));
-                                    } else {
-                                        imgList.add(CreateBlankImage(248, 248));
-                                    }
-                                } else {
-                                    image = new File(dir + mBarcode + "_" + mDate + "_" + 3 + ".png");
-                                    if(image.exists()) {
-                                        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-                                        Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath(), bmOptions);
-                                        if(bitmap != null) {
-                                            imgList.add(CreateBlankImage(bitmap.getWidth(), bitmap.getHeight()));
-                                        } else {
-                                            imgList.add(CreateBlankImage(248, 248));
-                                        }
-                                    } else {
-                                        image = new File(dir + mBarcode + "_" + mDate + "_" + 4 + ".png");
-                                        if(image.exists()) {
-                                            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-                                            Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath(), bmOptions);
-                                            if(bitmap != null) {
-                                                imgList.add(CreateBlankImage(bitmap.getWidth(), bitmap.getHeight()));
-                                            } else {
-                                                imgList.add(CreateBlankImage(248, 248));
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    ProcessImage(imgList);
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
