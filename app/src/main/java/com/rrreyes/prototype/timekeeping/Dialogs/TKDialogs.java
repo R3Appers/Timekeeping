@@ -53,7 +53,6 @@ public class TKDialogs {
     private EditText Password;
     private Button Btn_Submit;
 
-    EditText BranchID;
     EditText EmpIDN;
     Button Btn_SyncData;
     Button Btn_SendDTR;
@@ -141,14 +140,9 @@ public class TKDialogs {
         dialog = new Dialog(context);
         dialog.setContentView(R.layout.dialog_admin_config);
         dialog.setCancelable(true);
-        BranchID = dialog.findViewById(R.id.BranchID);
         Btn_SyncData = dialog.findViewById(R.id.Btn_SyncData);
         Btn_SendDTR = dialog.findViewById(R.id.Btn_SendDTR);
         Btn_Logout = dialog.findViewById(R.id.Btn_Logout);
-
-        if(sd.GetBranchID() != 0) {
-            BranchID.setText(sd.GetBranchID() + "");
-        }
 
         if(sd.GetFirstTime()) {
             Btn_SendDTR.setEnabled(false);
@@ -165,109 +159,92 @@ public class TKDialogs {
                 Btn_SendDTR.setEnabled(false);
                 Btn_SyncData.setText(Constants.WAIT);
                 Btn_SendDTR.setText(Constants.WAIT);
-                if((!BranchID.getText().toString().trim().equals(""))
-                        && (!BranchID.getText().toString().trim().equals(" "))
-                        && (BranchID.getText().toString().trim() != null)) {
-                    sd.SetBranchID(Integer.parseInt(BranchID.getText().toString().trim()));
-                    service = RetrofitData.newInstance(context, sd.GetToken());
-                    service.getAllEmployees(sd.GetCompanyID()).enqueue(new Callback<Employee>() {
-                        @Override
-                        public void onResponse(Call<Employee> call, Response<Employee> response) {
-                            Btn_SyncData.setEnabled(true);
-                            Btn_SendDTR.setEnabled(true);
-                            Btn_SyncData.setText(R.string.syncdata);
-                            Btn_SendDTR.setText(R.string.senddtr);
-                            Employee emp = null;
-                            if(response.body() != null) {
-                                emp = response.body();
-                            }
-                            if(emp != null) {
-                                if(emp.getCode() == 200) {
-                                    List<EmployeeData> emps = emp.getData();
-                                    empi = new ArrayList<>();
-                                    for(EmployeeData emd : emps) {
-                                        EmployeeInfo tempi = new EmployeeInfo();
-                                        tempi.setBarcode(emd.getBarcode());
-                                        tempi.setBranchID(emd.getBranchID());
-                                        tempi.setBranchName(emd.getBranchName());
-                                        tempi.setFirstName(emd.getFirstName());
-                                        tempi.setMiddleName(emd.getMiddleName());
-                                        tempi.setLastName(emd.getLastName());
-                                        tempi.setPosition(emd.getPosition());
-                                        empi.add(tempi);
-                                    }
-
-                                    Realm.init(context);
-
-                                    Realm realm = Realm.getDefaultInstance();
-
-                                    realm.executeTransactionAsync(new Realm.Transaction() {
-                                        @Override
-                                        public void execute(Realm realm) {
-                                            realm.copyToRealmOrUpdate(empi);
-                                        }
-                                    }, new Realm.Transaction.OnSuccess() {
-                                        @Override
-                                        public void onSuccess() {
-                                            Btn_SyncData.setEnabled(true);
-                                            Btn_SendDTR.setEnabled(true);
-                                            Btn_SyncData.setText(R.string.syncdata);
-                                            Btn_SendDTR.setText(R.string.senddtr);
-                                            Toast.makeText(context, Constants.SUCCESS_SYNC, Toast.LENGTH_LONG).show();
-                                            sd.SetFirstTime(false);
-                                        }
-                                    }, new Realm.Transaction.OnError() {
-                                        @Override
-                                        public void onError(Throwable error) {
-                                            Btn_SyncData.setEnabled(true);
-                                            Btn_SendDTR.setEnabled(true);
-                                            Btn_SyncData.setText(R.string.syncdata);
-                                            Btn_SendDTR.setText(R.string.senddtr);
-                                            Toast.makeText(context, Constants.FAIL_SYNC2, Toast.LENGTH_LONG).show();
-                                            Log.e(Constants.DENIED, error.getMessage());
-                                        }
-                                    });
-                                } else {
-                                    Btn_SyncData.setEnabled(true);
-                                    Btn_SendDTR.setEnabled(true);
-                                    Btn_SyncData.setText(R.string.syncdata);
-                                    Btn_SendDTR.setText(R.string.senddtr);
-                                    Toast.makeText(context, Constants.FAIL_SYNC2, Toast.LENGTH_LONG).show();
-                                    Log.e(Constants.DENIED, emp.getMessage());
+                service = RetrofitData.newInstance(context, sd.GetToken());
+                service.getAllEmployees(sd.GetCompanyID()).enqueue(new Callback<Employee>() {
+                    @Override
+                    public void onResponse(Call<Employee> call, Response<Employee> response) {
+                        Btn_SyncData.setEnabled(true);
+                        Btn_SendDTR.setEnabled(true);
+                        Btn_SyncData.setText(R.string.syncdata);
+                        Btn_SendDTR.setText(R.string.senddtr);
+                        Employee emp = null;
+                        if(response.body() != null) {
+                            emp = response.body();
+                        }
+                        if(emp != null) {
+                            if(emp.getCode() == 200) {
+                                List<EmployeeData> emps = emp.getData();
+                                empi = new ArrayList<>();
+                                for(EmployeeData emd : emps) {
+                                    EmployeeInfo tempi = new EmployeeInfo();
+                                    tempi.setBarcode(emd.getBarcode());
+                                    tempi.setBranchID(emd.getBranchID());
+                                    tempi.setBranchName(emd.getBranchName());
+                                    tempi.setFirstName(emd.getFirstName());
+                                    tempi.setMiddleName(emd.getMiddleName());
+                                    tempi.setLastName(emd.getLastName());
+                                    tempi.setPosition(emd.getPosition());
+                                    empi.add(tempi);
                                 }
+
+                                Realm.init(context);
+
+                                Realm realm = Realm.getDefaultInstance();
+
+                                realm.executeTransactionAsync(new Realm.Transaction() {
+                                    @Override
+                                    public void execute(Realm realm) {
+                                        realm.copyToRealmOrUpdate(empi);
+                                    }
+                                }, new Realm.Transaction.OnSuccess() {
+                                    @Override
+                                    public void onSuccess() {
+                                        Btn_SyncData.setEnabled(true);
+                                        Btn_SendDTR.setEnabled(true);
+                                        Btn_SyncData.setText(R.string.syncdata);
+                                        Btn_SendDTR.setText(R.string.senddtr);
+                                        Toast.makeText(context, Constants.SUCCESS_SYNC, Toast.LENGTH_LONG).show();
+                                        sd.SetFirstTime(false);
+                                    }
+                                }, new Realm.Transaction.OnError() {
+                                    @Override
+                                    public void onError(Throwable error) {
+                                        Btn_SyncData.setEnabled(true);
+                                        Btn_SendDTR.setEnabled(true);
+                                        Btn_SyncData.setText(R.string.syncdata);
+                                        Btn_SendDTR.setText(R.string.senddtr);
+                                        Toast.makeText(context, Constants.FAIL_SYNC2, Toast.LENGTH_LONG).show();
+                                        Log.e(Constants.DENIED, error.getMessage());
+                                    }
+                                });
+                            } else {
+                                Btn_SyncData.setEnabled(true);
+                                Btn_SendDTR.setEnabled(true);
+                                Btn_SyncData.setText(R.string.syncdata);
+                                Btn_SendDTR.setText(R.string.senddtr);
+                                Toast.makeText(context, Constants.FAIL_SYNC2, Toast.LENGTH_LONG).show();
+                                Log.e(Constants.DENIED, emp.getMessage());
                             }
                         }
+                    }
 
-                        @Override
-                        public void onFailure(Call<Employee> call, Throwable t) {
-                            Btn_SyncData.setEnabled(true);
-                            Btn_SendDTR.setEnabled(true);
-                            Btn_SyncData.setText(R.string.syncdata);
-                            Btn_SendDTR.setText(R.string.senddtr);
-                            Toast.makeText(context, Constants.ERROR_SYNC, Toast.LENGTH_LONG).show();
-                            Log.e(Constants.DENIED, t.getMessage());
-                        }
-                    });
-                } else {
-                    Btn_SyncData.setEnabled(true);
-                    Btn_SendDTR.setEnabled(true);
-                    Btn_SyncData.setText(R.string.syncdata);
-                    Btn_SendDTR.setText(R.string.senddtr);
-                    Toast.makeText(context, Constants.FAIL_SYNC, Toast.LENGTH_LONG).show();
-                }
+                    @Override
+                    public void onFailure(Call<Employee> call, Throwable t) {
+                        Btn_SyncData.setEnabled(true);
+                        Btn_SendDTR.setEnabled(true);
+                        Btn_SyncData.setText(R.string.syncdata);
+                        Btn_SendDTR.setText(R.string.senddtr);
+                        Toast.makeText(context, Constants.ERROR_SYNC, Toast.LENGTH_LONG).show();
+                        Log.e(Constants.DENIED, t.getMessage());
+                    }
+                });
             }
         });
         Btn_SendDTR.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if((!BranchID.getText().toString().trim().equals(""))
-                        && (!BranchID.getText().toString().trim().equals(" "))
-                        && (BranchID.getText().toString().trim() != null)) {
-                    Intent i = new Intent(context, DTRActivity.class);
-                    context.startActivity(i);
-                } else {
-                    Toast.makeText(context, Constants.FAIL_SYNC, Toast.LENGTH_LONG).show();
-                }
+                Intent i = new Intent(context, DTRActivity.class);
+                context.startActivity(i);
             }
         });
         Btn_Logout.setOnClickListener(new View.OnClickListener() {

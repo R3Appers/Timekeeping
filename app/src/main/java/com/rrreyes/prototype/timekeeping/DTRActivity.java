@@ -271,7 +271,6 @@ public class DTRActivity extends AppCompatActivity implements DatePickerDialog.O
             syncData.setEndDate(Btn_EndDate.getText().toString());
             syncData.setCompanyID(sd.GetCompanyID());
             syncData.setUserID(sd.GetUserID());
-            syncData.setBranchID(sd.GetBranchID());
             JSONArray dataArray = new JSONArray();
             for (int i=0; i < datas.size(); i++) {
                 dataArray.put(datas.get(i).getJSONObject());
@@ -471,7 +470,6 @@ public class DTRActivity extends AppCompatActivity implements DatePickerDialog.O
                     }
                     service.sendDTR(
                             sd.GetCompanyID(),
-                            sd.GetBranchID(),
                             sd.GetUserID(),
                             datas.get(a).getDate(),
                             datas.get(a).getBarcode(),
@@ -508,7 +506,7 @@ public class DTRActivity extends AppCompatActivity implements DatePickerDialog.O
             try {
                 String pid = new StringBuilder(sd.GetCompanyID())
                         .append("/")
-                        .append(sd.GetBranchID())
+                        .append(sd.GetCompanyID())
                         .append("/")
                         .append(date)
                         .toString();

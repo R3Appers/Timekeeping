@@ -177,6 +177,7 @@
             android:layout_width="92dp"
             android:layout_height="64dp"
             android:src="@mipmap/ic_logo"
+            android:padding="2dp"
             android:background="@drawable/background_oval_white"/>
 
     </LinearLayout>

@@ -44,7 +44,6 @@ public interface TKService {
     @POST("/employee/jar/v1/sync/dtr/{compID}")
     Call<BasicResponse> sendDTR(
             @Path("compID") int id,
-            @Field("branch_id") int bid,
             @Field("user_id") int uid,
             @Field("start_date") String date,
             @Field("emp_id") String barcode,

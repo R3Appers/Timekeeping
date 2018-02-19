@@ -24,13 +24,13 @@ public class SharedData {
         sp.edit().putBoolean(Constants.KEY_FIRST_RUN, set).apply();
     }
 
-    public int GetBranchID() {
+    /*public int GetBranchID() {
         return sp.getInt(Constants.KEY_BRANCH_ID, 0);
     }
 
     public void SetBranchID(int set) {
         sp.edit().putInt(Constants.KEY_BRANCH_ID, set).apply();
-    }
+    }*/
 
     public int GetCompanyID() {
         return sp.getInt(Constants.KEY_COMPANY_ID, 0);
