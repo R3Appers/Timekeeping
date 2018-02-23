@@ -26,6 +26,18 @@
         android:textSize="16sp"
         android:textColor="@color/colorWhite" />
 
+    <LinearLayout
+        android:id="@+id/LL_DeviceStatus"
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:layout_marginBottom="2dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/RV_DTRView"
+        android:background="@color/colorAccent"/>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/RV_DTRView"
         android:layout_width="match_parent"

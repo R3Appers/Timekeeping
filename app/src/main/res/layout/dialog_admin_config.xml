@@ -73,6 +73,15 @@
             android:textColor="@color/colorWhite"
             android:background="@color/colorPrimaryDark"/>
 
+        <TextView
+            android:id="@+id/TV_RegisteredLocation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:gravity="center"
+            android:text="@string/placeholder"
+            android:textColor="@color/colorGray"/>
+
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

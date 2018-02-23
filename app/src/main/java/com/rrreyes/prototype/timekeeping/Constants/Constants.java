@@ -17,9 +17,10 @@ public class Constants {
 
     public static String KEY_FIRST_RUN = "FirstRun";
     public static String KEY_COMPANY_ID = "CompanyID";
-    public static String KEY_BRANCH_ID = "BranchID";
     public static String KEY_USER_ID = "UserID";
     public static String KEY_TOKEN = "Token";
+    public static String KEY_LONGITUDE = "Longitude";
+    public static String KEY_LATITUDE = "Latitude";
 
     public static final String LOG_TAG = "==PERMISSION==";
     public static final String GRANTED = "Permission Granted!";

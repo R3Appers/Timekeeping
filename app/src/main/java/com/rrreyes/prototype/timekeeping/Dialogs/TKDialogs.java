@@ -1,8 +1,17 @@
 package com.rrreyes.prototype.timekeeping.Dialogs;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Bundle;
+import android.provider.Settings;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -17,6 +26,7 @@ import com.rrreyes.prototype.timekeeping.Constants.SharedData;
 import com.rrreyes.prototype.timekeeping.DTRActivity;
 import com.rrreyes.prototype.timekeeping.Interfaces.TKService;
 import com.rrreyes.prototype.timekeeping.MainActivity;
+import com.rrreyes.prototype.timekeeping.Manifest;
 import com.rrreyes.prototype.timekeeping.Models.Employee;
 import com.rrreyes.prototype.timekeeping.Models.EmployeeData;
 import com.rrreyes.prototype.timekeeping.Models.EmployeeInfo;
@@ -53,6 +63,9 @@ public class TKDialogs {
     private EditText Password;
     private Button Btn_Submit;
 
+    private LocationManager locationManager;
+    double lng, lat;
+
     EditText EmpIDN;
     Button Btn_SyncData;
     Button Btn_SendDTR;
@@ -63,6 +76,7 @@ public class TKDialogs {
     TextView TV_EmpIDN;
     TextView TV_EmpName;
     TextView TV_EmpLog;
+    TextView TV_RegisteredLocation;
 
     List<EmployeeInfo> empi;
     EmployeeInfo empInfo;
@@ -143,13 +157,78 @@ public class TKDialogs {
         Btn_SyncData = dialog.findViewById(R.id.Btn_SyncData);
         Btn_SendDTR = dialog.findViewById(R.id.Btn_SendDTR);
         Btn_Logout = dialog.findViewById(R.id.Btn_Logout);
+        TV_RegisteredLocation = dialog.findViewById(R.id.TV_RegisteredLocation);
 
         if(sd.GetFirstTime()) {
             Btn_SendDTR.setEnabled(false);
             Btn_SendDTR.setVisibility(View.GONE);
+
+            final LocationListener locationListener = new LocationListener() {
+                @Override
+                public void onLocationChanged(Location location) {
+                    lng = location.getLongitude();
+                    lat = location.getLatitude();
+                    StringBuilder locationBuilder = new StringBuilder();
+                    locationBuilder
+                            .append("(")
+                            .append(lat)
+                            .append(", ")
+                            .append(lng)
+                            .append(")");
+                    TV_RegisteredLocation.setText(locationBuilder.toString());
+                }
+
+                @Override
+                public void onStatusChanged(String provider, int status, Bundle extras) {
+
+                }
+
+                @Override
+                public void onProviderEnabled(String provider) {
+
+                }
+
+                @Override
+                public void onProviderDisabled(String provider) {
+
+                }
+            };
+
+            locationManager = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
+            if(ContextCompat.checkSelfPermission(context, "android.permission.ACCESS_FINE_LOCATION") == PackageManager.PERMISSION_GRANTED) {
+                try {
+                    if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
+                    } else {
+                        /*AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
+                        alertDialog.setMessage("GPS NOT ENABLED");
+                        alertDialog.setPositiveButton("Turn it on", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                                // TODO Auto-generated method stub
+                                Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                                context.startActivity(myIntent);
+                            }
+                        });
+                        AlertDialog aDialog = alertDialog.create();
+                        aDialog.show();*/
+                        Toast.makeText(context, "GPS NOT ENABLED. TURN ON YOUR LOCATION", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
         } else {
             Btn_SendDTR.setEnabled(true);
             Btn_SendDTR.setVisibility(View.VISIBLE);
+            StringBuilder locationBuilder = new StringBuilder();
+            locationBuilder
+                    .append("(")
+                    .append(sd.GetLatitude())
+                    .append(", ")
+                    .append(sd.GetLongitude())
+                    .append(")");
+            TV_RegisteredLocation.setText(locationBuilder.toString());
         }
 
         Btn_SyncData.setOnClickListener(new View.OnClickListener() {
@@ -251,6 +330,10 @@ public class TKDialogs {
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
+                if((sd.GetLatitude() == 0.0f) && (sd.GetLongitude() == 0.0f)) {
+                    sd.SetLatitude(lat);
+                    sd.SetLongitude(lng);
+                }
                 Intent i = new Intent(context, MainActivity.class);
                 context.startActivity(i);
             }

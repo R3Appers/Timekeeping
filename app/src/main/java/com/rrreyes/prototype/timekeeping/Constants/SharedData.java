@@ -55,4 +55,22 @@ public class SharedData {
     public void SetUserID(int set) {
         sp.edit().putInt(Constants.KEY_USER_ID, set).apply();
     }
+
+    public double GetLongitude() {
+        return sp.getFloat(Constants.KEY_LONGITUDE, 0.0f);
+    }
+
+    public void SetLongitude(double set) {
+        sp.edit().putFloat(Constants.KEY_LONGITUDE, (float)set).apply();
+    }
+
+    public double GetLatitude() {
+        return sp.getFloat(Constants.KEY_LATITUDE, 0.0f);
+    }
+
+    public void SetLatitude(double set) {
+        sp.edit().putFloat(Constants.KEY_LATITUDE, (float)set).apply();
+    }
+
+
 }
