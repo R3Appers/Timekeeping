@@ -17,14 +17,49 @@
     <TextView
         android:id="@+id/TV_DateTime"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="50dp"
-        android:layout_marginStart="50dp"
+        android:layout_height="38dp"
         android:gravity="end"
         android:padding="6dp"
         android:text="@string/placeholder"
+        android:textColor="@color/colorWhite"
         android:textSize="16sp"
-        android:textColor="@color/colorWhite" />
+        tools:layout_editor_absoluteX="50dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:gravity="end"
+        app:layout_constraintTop_toTopOf="@+id/TV_DateTime"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:layout_gravity="end"
+            android:gravity="center"
+            android:text="@string/currentDate"/>
+
+        <TextView
+            android:id="@+id/Btn_CurrentDate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:paddingLeft="8dp"
+            android:paddingStart="8dp"
+            android:paddingRight="8dp"
+            android:paddingEnd="8dp"
+            android:layout_weight="2"
+            android:gravity="end"
+            android:text="@string/placeholder"
+            android:background="@color/colorPrimaryDark"
+            android:onClick="DatePicker"/>
+
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/LL_DeviceStatus"
@@ -35,6 +70,7 @@
         android:layout_marginLeft="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
+        android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@+id/RV_DTRView"
         android:background="@color/colorAccent"/>
 

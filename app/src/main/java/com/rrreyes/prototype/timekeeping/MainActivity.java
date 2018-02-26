@@ -2,6 +2,7 @@ package com.rrreyes.prototype.timekeeping;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -21,6 +22,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -36,15 +38,16 @@ import com.rrreyes.prototype.timekeeping.Models.DTRData;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import io.realm.Realm;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
     ImageView Btn_Settings;
     LinearLayout LL_Screen, LL_DeviceStatus, Btn_TimeIn, Btn_TimeOut, Btn_BreakIn, Btn_BreakOut;
-    TextView TV_DateTime;
+    TextView TV_DateTime, Btn_CurrentDate;
     RecyclerView RV_DTRView;
     boolean isFirstRun;
 
@@ -52,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
     Calendar calendar;
     String currentDate;
+    String currentViewDate = null;
     MainLogAdapter MLAdapter;
 
     LocationManager locationManager;
@@ -59,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
     double lng, lat;
 
     Handler handler, realmHandler;
+    Runnable realmrun;
     boolean mStopHandler = false;
     boolean isInPremises = false;
     boolean isAutoTime = false;
@@ -125,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
     void InitViews() {
         LL_Screen = findViewById(R.id.LL_Screen);
         LL_DeviceStatus = findViewById(R.id.LL_DeviceStatus);
+        Btn_CurrentDate = findViewById(R.id.Btn_CurrentDate);
         Btn_Settings = findViewById(R.id.Btn_Settings);
         Btn_TimeIn = findViewById(R.id.Btn_TimeIn);
         Btn_BreakOut = findViewById(R.id.Btn_BreakOut);
@@ -161,6 +167,12 @@ public class MainActivity extends AppCompatActivity {
                         .append(" : ")
                         .append(currentTime)
                         .toString();
+
+                if(currentViewDate == null) {
+                    currentViewDate = currentDate;
+                    Btn_CurrentDate.setText(currentViewDate);
+                }
+
                 try {
                     int auto_time = 0;
                     if(Build.VERSION.SDK_INT >= 17) {
@@ -178,16 +190,8 @@ public class MainActivity extends AppCompatActivity {
                 } finally {
                     if(isAutoTime && isInPremises) {
                         LL_DeviceStatus.setBackgroundColor(getResources().getColor(R.color.tabTextColorB));
-                        /*Btn_TimeIn.setEnabled(true);
-                        Btn_BreakOut.setEnabled(true);
-                        Btn_BreakIn.setEnabled(true);
-                        Btn_TimeOut.setEnabled(true);*/
                     } else {
                         LL_DeviceStatus.setBackgroundColor(getResources().getColor(R.color.tabTextColorA));
-                        /*Btn_TimeIn.setEnabled(false);
-                        Btn_BreakOut.setEnabled(false);
-                        Btn_BreakIn.setEnabled(false);
-                        Btn_TimeOut.setEnabled(false);*/
                     }
                 }
                 TV_DateTime.setText(dateTime);
@@ -197,16 +201,20 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        Runnable realmrun = new Runnable() {
+        realmrun = new Runnable() {
             @Override
             public void run() {
                 try {
                     realm.beginTransaction();
                     String yesterDate = Constants.DATE_FORMAT.format(GetYesterday());
+                    String tomorrDate = Constants.DATE_FORMAT.format(GetTomorrow());
+                    Log.e("==DT==", yesterDate + ", " + currentViewDate +", " + tomorrDate);
                     dataList = realm
                             .where(DTRData.class)
                             .beginGroup()
-                            .equalTo("Date", currentDate)
+                            .equalTo("Date", tomorrDate)
+                            .or()
+                            .equalTo("Date", currentViewDate)
                             .or()
                             .equalTo("Date", yesterDate)
                             .endGroup()
@@ -219,32 +227,7 @@ public class MainActivity extends AppCompatActivity {
                     RV_DTRView.setLayoutManager(LLManager);
                     RV_DTRView.setAdapter(MLAdapter);
                     RV_DTRView.scrollToPosition(MLAdapter.getItemCount() - 1);
-
-                    /*StringBuilder logBuilder = new StringBuilder();
-                    for(int i = 0; i < dataList.size(); i++) {
-                        logBuilder
-                                .append(dataList.get(i).getName())
-                                .append(" | ")
-                                .append(dataList.get(i).getDate())
-                                .append(" | ")
-                                .append(dataList.get(i).getTime())
-                                .append(" | ");
-                        switch (dataList.get(i).getType()) {
-                            case "1" :
-                                logBuilder.append("TIME IN");
-                                break;
-                            case "2" :
-                                logBuilder.append("BREAK OUT");
-                                break;
-                            case "3" :
-                                logBuilder.append("BREAK IN");
-                                break;
-                            case "4" :
-                                logBuilder.append("TIME OUT");
-                                break;
-                        }
-                        logBuilder.append("\n");
-                    }*/
+                    MLAdapter.notifyDataSetChanged();
                     realm.commitTransaction();
                 } catch (Exception ex) {
                     Log.e("==REALM==", ex.getMessage());
@@ -305,7 +288,23 @@ public class MainActivity extends AppCompatActivity {
 
     Date GetYesterday() {
         Calendar cal = Calendar.getInstance();
+        int year = Integer.parseInt(currentViewDate.substring(0, 4));
+        int month = Integer.parseInt(currentViewDate.substring(5, 7));
+        int day = Integer.parseInt(currentViewDate.substring(8, 10));
+        Log.e("==DT==", year + " - " + month + " - " + day);
+        cal.set(year, month - 1, day);
         cal.add(Calendar.DATE, -1);
+        return cal.getTime();
+    }
+
+    Date GetTomorrow() {
+        Calendar cal = Calendar.getInstance();
+        int year = Integer.parseInt(currentViewDate.substring(0, 4));
+        int month = Integer.parseInt(currentViewDate.substring(5, 7));
+        int day = Integer.parseInt(currentViewDate.substring(8, 10));
+        Log.e("==DT==", year + " - " + month + " - " + day);
+        cal.set(year, month - 1, day);
+        cal.add(Calendar.DATE, 1);
         return cal.getTime();
     }
 
@@ -363,5 +362,25 @@ public class MainActivity extends AppCompatActivity {
                 ex.printStackTrace();
             }
         }
+    }
+
+    @Override
+    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+        Calendar cal = new GregorianCalendar(year, month, dayOfMonth);
+        SetDate(cal, year, month, dayOfMonth);
+    }
+
+    private void SetDate(final Calendar calendar, int year, int month, int day) {
+        final String date = Constants.DATE_FORMAT.format(calendar.getTime());
+        int dateInt = (year * 10000) + ((month + 1) * 100) + (day);
+        Log.i("==DATEINT==", dateInt + "");
+        currentViewDate = date;
+        Btn_CurrentDate.setText(date);
+        realmHandler.post(realmrun);
+    }
+
+    public void DatePicker(View view){
+        DTRActivity.DatePickerFragment fragment = new DTRActivity.DatePickerFragment();
+        fragment.show(getFragmentManager(), "DATE");
     }
 }

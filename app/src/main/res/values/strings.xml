@@ -27,4 +27,5 @@
     <string name="scanidhere">Scan your ID here</string>
     <string name="dtrlogdata">DATE | EMPLOYEE ID | STATUS</string>
     <string name="placeholder">**********</string>
+    <string name="currentDate">Current View Date:</string>
 </resources>
