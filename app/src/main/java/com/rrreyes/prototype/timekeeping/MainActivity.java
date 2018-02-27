@@ -281,7 +281,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     }
 
     void ShowSettings() {
-        TKDialogs tkDialogs = new TKDialogs(this);
+        TKDialogs tkDialogs = new TKDialogs(this, this);
         Dialog dialog = tkDialogs.LoginDialog();
         dialog.show();
     }
@@ -361,6 +361,19 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
+        } else {
+            if (Build.VERSION.SDK_INT >= 23) {
+                ActivityCompat.requestPermissions(
+                        this,
+                        new String[]{
+                                Manifest.permission.ACCESS_FINE_LOCATION
+                        },
+                        1);
+            }
+            else {
+                // Permission automatically granted on sdk<23 upon installation
+                Log.v(Constants.LOG_TAG, Constants.GRANTED);
+            }
         }
     }
 
@@ -380,7 +393,28 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     }
 
     public void DatePicker(View view){
-        DTRActivity.DatePickerFragment fragment = new DTRActivity.DatePickerFragment();
-        fragment.show(getFragmentManager(), "DATE");
+        if((ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_CALENDAR) == PackageManager.PERMISSION_GRANTED) &&
+                (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED)) {
+            try {
+                DTRActivity.DatePickerFragment fragment = new DTRActivity.DatePickerFragment();
+                fragment.show(getFragmentManager(), "DATE");
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        } else {
+            if (Build.VERSION.SDK_INT >= 23) {
+                ActivityCompat.requestPermissions(
+                        this,
+                        new String[]{
+                                Manifest.permission.READ_CALENDAR,
+                                Manifest.permission.WRITE_CALENDAR
+                        },
+                        1);
+            }
+            else {
+                // Permission automatically granted on sdk<23 upon installation
+                Log.v(Constants.LOG_TAG, Constants.GRANTED);
+            }
+        }
     }
 }

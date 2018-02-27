@@ -1,5 +1,6 @@
 package com.rrreyes.prototype.timekeeping.Dialogs;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -9,8 +10,10 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
@@ -56,6 +59,7 @@ public class TKDialogs {
     private TKService service;
 
     private Context context;
+    private Activity activity;
 
     private Dialog dialog;
 
@@ -84,7 +88,8 @@ public class TKDialogs {
     Realm realm;
     private SharedData sd;
 
-    public TKDialogs(Context context) {
+    public TKDialogs(Activity activity, Context context) {
+        this.activity = activity;
         this.context = context;
         this.sd = new SharedData(context);
 
@@ -162,73 +167,22 @@ public class TKDialogs {
         if(sd.GetFirstTime()) {
             Btn_SendDTR.setEnabled(false);
             Btn_SendDTR.setVisibility(View.GONE);
-
-            final LocationListener locationListener = new LocationListener() {
-                @Override
-                public void onLocationChanged(Location location) {
-                    lng = location.getLongitude();
-                    lat = location.getLatitude();
-                    StringBuilder locationBuilder = new StringBuilder();
-                    locationBuilder
-                            .append("(")
-                            .append(lat)
-                            .append(", ")
-                            .append(lng)
-                            .append(")");
-                    TV_RegisteredLocation.setText(locationBuilder.toString());
-                }
-
-                @Override
-                public void onStatusChanged(String provider, int status, Bundle extras) {
-
-                }
-
-                @Override
-                public void onProviderEnabled(String provider) {
-
-                }
-
-                @Override
-                public void onProviderDisabled(String provider) {
-
-                }
-            };
-
-            locationManager = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
-            if(ContextCompat.checkSelfPermission(context, "android.permission.ACCESS_FINE_LOCATION") == PackageManager.PERMISSION_GRANTED) {
-                try {
-                    if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
-                    } else {
-                        /*AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
-                        alertDialog.setMessage("GPS NOT ENABLED");
-                        alertDialog.setPositiveButton("Turn it on", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-                                // TODO Auto-generated method stub
-                                Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                                context.startActivity(myIntent);
-                            }
-                        });
-                        AlertDialog aDialog = alertDialog.create();
-                        aDialog.show();*/
-                        Toast.makeText(context, "GPS NOT ENABLED. TURN ON YOUR LOCATION", Toast.LENGTH_SHORT).show();
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
+            RunGPS();
         } else {
             Btn_SendDTR.setEnabled(true);
             Btn_SendDTR.setVisibility(View.VISIBLE);
-            StringBuilder locationBuilder = new StringBuilder();
-            locationBuilder
-                    .append("(")
-                    .append(sd.GetLatitude())
-                    .append(", ")
-                    .append(sd.GetLongitude())
-                    .append(")");
-            TV_RegisteredLocation.setText(locationBuilder.toString());
+            if(sd.GetLatitude() != 0.0f && sd.GetLongitude() != 0.0f) {
+                StringBuilder locationBuilder = new StringBuilder();
+                locationBuilder
+                        .append("(")
+                        .append(sd.GetLatitude())
+                        .append(", ")
+                        .append(sd.GetLongitude())
+                        .append(")");
+                TV_RegisteredLocation.setText(locationBuilder.toString());
+            } else {
+                RunGPS();
+            }
         }
 
         Btn_SyncData.setOnClickListener(new View.OnClickListener() {
@@ -459,5 +413,64 @@ public class TKDialogs {
         });
 
         return dialog;
+    }
+
+    void RunGPS() {
+        final LocationListener locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                lng = location.getLongitude();
+                lat = location.getLatitude();
+                StringBuilder locationBuilder = new StringBuilder();
+                locationBuilder
+                        .append("(")
+                        .append(lat)
+                        .append(", ")
+                        .append(lng)
+                        .append(")");
+                TV_RegisteredLocation.setText(locationBuilder.toString());
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        };
+
+        locationManager = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
+        if(ContextCompat.checkSelfPermission(context, "android.permission.ACCESS_FINE_LOCATION") == PackageManager.PERMISSION_GRANTED) {
+            try {
+                if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
+                } else {
+                    Toast.makeText(context, "GPS NOT ENABLED. TURN ON YOUR LOCATION", Toast.LENGTH_SHORT).show();
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        } else {
+            if (Build.VERSION.SDK_INT >= 23) {
+                ActivityCompat.requestPermissions(
+                        activity,
+                        new String[]{
+                                android.Manifest.permission.ACCESS_FINE_LOCATION
+                        },
+                        1);
+            }
+            else {
+                // Permission automatically granted on sdk<23 upon installation
+                Log.v(Constants.LOG_TAG, Constants.GRANTED);
+            }
+        }
     }
 }

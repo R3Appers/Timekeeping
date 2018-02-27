@@ -111,7 +111,7 @@ public class ScanActivity extends AppCompatActivity {
         Btn_ForgotID.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Dialog dialog = new TKDialogs(thisActivity).ForgotID(TimeType);
+                Dialog dialog = new TKDialogs(thisActivity, thisActivity).ForgotID(TimeType);
                 dialog.show();
             }
         });
