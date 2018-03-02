@@ -30,8 +30,16 @@
         android:background="@color/colorWhite">
 
         <TextView
+            android:id="@+id/TV_Version"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text="@string/placeholder"
+            android:textColor="@color/colorDarkGray"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
             android:text="@string/username"
             android:textColor="@color/colorBlack"/>
 

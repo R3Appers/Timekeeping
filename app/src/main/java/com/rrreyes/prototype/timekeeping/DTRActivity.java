@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -71,17 +72,19 @@ public class DTRActivity extends AppCompatActivity implements DatePickerDialog.O
     View selectedView;
     boolean hasStart, hasEnd;
 
-    // TODO Logout
-
     Handler realmHandler;
 
     private TKService service;
     private SharedData sd;
     private DTRSync syncData;
 
+    private List<DTRLogV2> logs;
+
     List<DTRLog> dtrLogs = new ArrayList<>();
     List<DTRLogV2> dtrLogsV2 = new ArrayList<>();
     List<DTRDataSyncV2> datas = new ArrayList<>();
+
+    ProgressDialog progressDialog;
 
     int StartDate = 0;
     int EndDate = 0;
@@ -352,6 +355,8 @@ public class DTRActivity extends AppCompatActivity implements DatePickerDialog.O
 
     void SendV2() {
         try {
+            progressDialog = new ProgressDialog(this);
+
             realm.beginTransaction();
             datas = new ArrayList<>();
 
@@ -383,91 +388,16 @@ public class DTRActivity extends AppCompatActivity implements DatePickerDialog.O
                                                 + "-"
                                                 + String.format(Locale.US,"%02d", (i % 100)))
                                 .findAll();
-
-                if(tempDatas.size() != 0) {
-                    List<DTRDataSyncV2> tDatas = new ArrayList<>();
-                    for(int a = 0; a < tempDatas.size(); a++) {
-                        DTRData data = tempDatas.get(a);
-                        DTRDataSyncV2 tSync = new DTRDataSyncV2();
-                        if(tDatas.size() != 0) {
-                            int ctr = 0;
-                            for(int j = 0; j < tDatas.size(); j++) {
-                                if(tDatas.get(j).getDate().equals(data.getDate())
-                                        && tDatas.get(j).getBarcode().equals(data.getBarcode())) {
-                                    ctr++;
-                                    tSync = GetTimeByType(tDatas.get(j), data);
-                                    if(tSync.getImageUrl() == null) {
-                                        String imgPath = new StringBuilder(dir)
-                                                .append(data.getBarcode())
-                                                .append("_")
-                                                .append(data.getDate())
-                                                .append(".jpg")
-                                                .toString();
-                                        tSync.setImageUrl(UploadImage(
-                                                imgPath,
-                                                data.getBarcode(),
-                                                data.getDate()));
-                                    }
-                                    tDatas.remove(j);
-                                    tDatas.add(tSync);
-                                }
-                            }
-                            if(ctr == 0) {
-                                tSync.setDate(data.getDate());
-                                tSync.setBarcode(data.getBarcode());
-                                tSync = GetTimeByType(tSync, data);
-                                if(tSync.getImageUrl() == null) {
-                                    String imgPath = new StringBuilder(dir)
-                                            .append(data.getBarcode())
-                                            .append("_")
-                                            .append(data.getDate())
-                                            .append(".jpg")
-                                            .toString();
-                                    tSync.setImageUrl(UploadImage(
-                                            imgPath,
-                                            data.getBarcode(),
-                                            data.getDate()));
-                                }
-                                tDatas.add(tSync);
-                            }
-                        } else {
-                            tSync.setDate(data.getDate());
-                            tSync.setBarcode(data.getBarcode());
-                            tSync = GetTimeByType(tSync, data);
-                            if(tSync.getImageUrl() == null) {
-                                String imgPath = new StringBuilder(dir)
-                                        .append(data.getBarcode())
-                                        .append("_")
-                                        .append(data.getDate())
-                                        .append(".jpg")
-                                        .toString();
-                                tSync.setImageUrl(UploadImage(
-                                        imgPath,
-                                        data.getBarcode(),
-                                        data.getDate()));
-                            }
-                            tDatas.add(tSync);
-                        }
-                    }
-                    datas.addAll(tDatas);
-                }
+                ProcessDTR(tempDatas);
             }
             realm.commitTransaction();
 
             DataCounter = 0;
             if(datas.size() != 0) {
+                progressDialog.setMessage("Please Wait. Sending: " + DataCounter + "/"+ datas.size());
+                progressDialog.show();
+                logs.clear();
                 for(int a = 0; a < datas.size(); a++) {
-                    try {
-                        realm.beginTransaction();
-                        DTRLogV2 log = new DTRLogV2();
-                        log.setDate(datas.get(a).getDate());
-                        log.setBarcode(datas.get(a).getBarcode());
-                        log.setStatus("OK");
-                        realm.copyToRealm(log);
-                        realm.commitTransaction();
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
                     service.sendDTR(
                             sd.GetCompanyID(),
                             sd.GetUserID(),
@@ -484,6 +414,16 @@ public class DTRActivity extends AppCompatActivity implements DatePickerDialog.O
                                     DataCounter++;
                                     if(DataCounter >= datas.size() - 1) {
                                         FinishedSending(response);
+                                        progressDialog.dismiss();
+                                    } else {
+                                        progressDialog.setMessage("Please Wait. Sending: " + DataCounter + "/"+ datas.size());
+                                        if(response.body() != null) {
+                                            DTRLogV2 log = new DTRLogV2();
+                                            log.setDate(response.body().getDate());
+                                            log.setBarcode(response.body().getBarcode());
+                                            log.setStatus("OK");
+                                            logs.add(log);
+                                        }
                                     }
                                 }
 
@@ -494,6 +434,89 @@ public class DTRActivity extends AppCompatActivity implements DatePickerDialog.O
                             });
                 }
             }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void ProcessDTR(List<DTRData> tempDatas) {
+        if(tempDatas.size() != 0) {
+            List<DTRDataSyncV2> tDatas = new ArrayList<>();
+            for(int a = 0; a < tempDatas.size(); a++) {
+                DTRData data = tempDatas.get(a);
+                DTRDataSyncV2 tSync = new DTRDataSyncV2();
+                if(tDatas.size() != 0) {
+                    int ctr = 0;
+                    for(int j = 0; j < tDatas.size(); j++) {
+                        if(tDatas.get(j).getDate().equals(data.getDate())
+                                && tDatas.get(j).getBarcode().equals(data.getBarcode())) {
+                            ctr++;
+                            tSync = GetTimeByType(tDatas.get(j), data);
+                            if(tSync.getImageUrl() == null) {
+                                String imgPath = new StringBuilder(dir)
+                                        .append(data.getBarcode())
+                                        .append("_")
+                                        .append(data.getDate())
+                                        .append(".jpg")
+                                        .toString();
+                                tSync.setImageUrl(UploadImage(
+                                        imgPath,
+                                        data.getBarcode(),
+                                        data.getDate()));
+                            }
+                            tDatas.remove(j);
+                            tDatas.add(tSync);
+                        }
+                    }
+                    if(ctr == 0) {
+                        tSync.setDate(data.getDate());
+                        tSync.setBarcode(data.getBarcode());
+                        tSync = GetTimeByType(tSync, data);
+                        if(tSync.getImageUrl() == null) {
+                            String imgPath = new StringBuilder(dir)
+                                    .append(data.getBarcode())
+                                    .append("_")
+                                    .append(data.getDate())
+                                    .append(".jpg")
+                                    .toString();
+                            tSync.setImageUrl(UploadImage(
+                                    imgPath,
+                                    data.getBarcode(),
+                                    data.getDate()));
+                        }
+                        tDatas.add(tSync);
+                    }
+                } else {
+                    tSync.setDate(data.getDate());
+                    tSync.setBarcode(data.getBarcode());
+                    tSync = GetTimeByType(tSync, data);
+                    if(tSync.getImageUrl() == null) {
+                        String imgPath = new StringBuilder(dir)
+                                .append(data.getBarcode())
+                                .append("_")
+                                .append(data.getDate())
+                                .append(".jpg")
+                                .toString();
+                        tSync.setImageUrl(UploadImage(
+                                imgPath,
+                                data.getBarcode(),
+                                data.getDate()));
+                    }
+                    tDatas.add(tSync);
+                }
+            }
+            datas.addAll(tDatas);
+        }
+    }
+
+    private void ProcessLogs() {
+        try {
+            realm.beginTransaction();
+            for(int i = 0; i < logs.size(); i++) {
+                DTRLogV2 log = logs.get(i);
+                realm.copyToRealm(log);
+            }
+            realm.commitTransaction();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -510,12 +533,6 @@ public class DTRActivity extends AppCompatActivity implements DatePickerDialog.O
                         .append("/")
                         .append(date)
                         .toString();
-                /*cloudinary = new Cloudinary(InitCloudinary());
-                cloudinary
-                        .uploader()
-                        .upload(
-                                img.getAbsolutePath(),
-                                ObjectUtils.asMap("public_id", pid));*/
                 MediaManager
                         .get()
                         .upload(filepath)
@@ -709,6 +726,7 @@ public class DTRActivity extends AppCompatActivity implements DatePickerDialog.O
         }
         if(basicResponse != null) {
             if(basicResponse.getCode() == 200) {
+                ProcessLogs();
                 Toast.makeText(thisActivity, Constants.SUCCESS_SYNC, Toast.LENGTH_LONG).show();
                 Intent i = new Intent(thisActivity, MainActivity.class);
                 startActivity(i);

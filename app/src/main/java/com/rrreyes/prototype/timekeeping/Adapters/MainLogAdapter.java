@@ -45,6 +45,9 @@ public class MainLogAdapter extends RecyclerView.Adapter<MainLogAdapter.MainLogV
             holder.TV_TimeIn.setText("**:**");
         }
         if(data.getTimeOut() != null) {
+            if(GetHour(data.getTimeOut()) < 6) {
+                holder.TVLbl_TimeOut.setTextColor(context.getResources().getColor(R.color.tabTextColorA));
+            }
             holder.TV_TimeOut.setText(data.getTimeOut());
             holder.TV_TimeOut.setTextColor(context.getResources().getColor(R.color.tabTextColorA));
         } else {
@@ -74,6 +77,7 @@ public class MainLogAdapter extends RecyclerView.Adapter<MainLogAdapter.MainLogV
         TextView TV_Date, TV_EmpIDN;
         TextView TV_TimeIn, TV_TimeOut;
         TextView TV_BreakOut, TV_BreakIn;
+        TextView TVLbl_TimeOut;
 
         public MainLogViewHolder(View itemView) {
             super(itemView);
@@ -84,6 +88,11 @@ public class MainLogAdapter extends RecyclerView.Adapter<MainLogAdapter.MainLogV
             TV_TimeOut = itemView.findViewById(R.id.TV_TimeOut);
             TV_BreakOut = itemView.findViewById(R.id.TV_BreakOut);
             TV_BreakIn = itemView.findViewById(R.id.TV_BreakIn);
+            TVLbl_TimeOut = itemView.findViewById(R.id.TVLbl_TimeOut);
         }
+    }
+
+    int GetHour(String time) {
+        return Integer.parseInt(time.substring(0, 2));
     }
 }

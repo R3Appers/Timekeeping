@@ -84,11 +84,19 @@
             android:background="@color/colorPrimaryDark"
             android:onClick="DatePicker"/>
 
+        <LinearLayout
+            android:id="@+id/LL_Progress"
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:layout_marginTop="24dp"
+            android:orientation="horizontal"
+            android:background="@color/colorWhite"/>
+
         <Button
             android:id="@+id/Btn_Send"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
+            android:layout_marginTop="4dp"
             android:text="@string/senddtr"
             android:textColor="@color/colorBlack"
             android:textStyle="bold"

@@ -1,10 +1,9 @@
 package com.rrreyes.prototype.timekeeping.Dialogs;
 
 import android.app.Activity;
-import android.app.AlertDialog;
+import android.app.Application;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -12,7 +11,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -22,6 +20,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.rrreyes.prototype.timekeeping.BuildConfig;
 import com.rrreyes.prototype.timekeeping.CameraActivity;
 import com.rrreyes.prototype.timekeeping.Constants.Constants;
 import com.rrreyes.prototype.timekeeping.Constants.RetrofitData;
@@ -29,7 +28,6 @@ import com.rrreyes.prototype.timekeeping.Constants.SharedData;
 import com.rrreyes.prototype.timekeeping.DTRActivity;
 import com.rrreyes.prototype.timekeeping.Interfaces.TKService;
 import com.rrreyes.prototype.timekeeping.MainActivity;
-import com.rrreyes.prototype.timekeeping.Manifest;
 import com.rrreyes.prototype.timekeeping.Models.Employee;
 import com.rrreyes.prototype.timekeeping.Models.EmployeeData;
 import com.rrreyes.prototype.timekeeping.Models.EmployeeInfo;
@@ -37,7 +35,6 @@ import com.rrreyes.prototype.timekeeping.Models.Login;
 import com.rrreyes.prototype.timekeeping.Models.LoginCredentials;
 import com.rrreyes.prototype.timekeeping.R;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -81,6 +78,7 @@ public class TKDialogs {
     TextView TV_EmpName;
     TextView TV_EmpLog;
     TextView TV_RegisteredLocation;
+    TextView TV_Version;
 
     List<EmployeeInfo> empi;
     EmployeeInfo empInfo;
@@ -105,6 +103,9 @@ public class TKDialogs {
         Username = dialog.findViewById(R.id.Username);
         Password = dialog.findViewById(R.id.Password);
         Btn_Submit = dialog.findViewById(R.id.Btn_Submit);
+        TV_Version = dialog.findViewById(R.id.TV_Version);
+
+        TV_Version.setText(BuildConfig.VERSION_NAME);
         Btn_Submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
