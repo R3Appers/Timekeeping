@@ -192,10 +192,21 @@ public class DTRActivity extends AppCompatActivity implements DatePickerDialog.O
             @Override
             public void run() {
                 try {
+                    int offset = 0;
                     realm.beginTransaction();
-                    dtrLogsV2 = realm.where(DTRLogV2.class).findAll();
+                    dtrLogsV2 = realm.where(DTRLogV2.class)
+                            .findAll();
+                    if(sd.GetLastDTRCount() != 0) {
+                        if(dtrLogsV2.size() - sd.GetLastDTRCount() >= 0) {
+                            offset = dtrLogsV2.size() - sd.GetLastDTRCount();
+                        }
+                    } else {
+                        if(dtrLogsV2.size() > 200) {
+                            offset = dtrLogsV2.size() - 200;
+                        }
+                    }
                     StringBuilder logBuilder = new StringBuilder();
-                    for(int i = 0; i < dtrLogsV2.size(); i++) {
+                    for(int i = offset; i < dtrLogsV2.size(); i++) {
                         logBuilder
                                 .append(dtrLogsV2.get(i).getDate())
                                 .append(" | ")
@@ -394,6 +405,7 @@ public class DTRActivity extends AppCompatActivity implements DatePickerDialog.O
 
             DataCounter = 0;
             if(datas.size() != 0) {
+                sd.SetLastDTRCount(datas.size());
                 progressDialog.setMessage("Please Wait. Sending: " + DataCounter + "/"+ datas.size());
                 progressDialog.show();
                 logs.clear();

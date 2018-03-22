@@ -182,6 +182,14 @@ public class TKDialogs {
                         .append(")");
                 TV_RegisteredLocation.setText(locationBuilder.toString());
             } else {
+                StringBuilder locationBuilder = new StringBuilder();
+                locationBuilder
+                        .append("(")
+                        .append(sd.GetLatitude())
+                        .append(", ")
+                        .append(sd.GetLongitude())
+                        .append(")");
+                TV_RegisteredLocation.setText(locationBuilder.toString());
                 RunGPS();
             }
         }
@@ -452,7 +460,10 @@ public class TKDialogs {
         if(ContextCompat.checkSelfPermission(context, "android.permission.ACCESS_FINE_LOCATION") == PackageManager.PERMISSION_GRANTED) {
             try {
                 if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, locationListener);
+                    Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                    lat = location.getLatitude();
+                    lng = location.getLongitude();
                 } else {
                     Toast.makeText(context, "GPS NOT ENABLED. TURN ON YOUR LOCATION", Toast.LENGTH_SHORT).show();
                 }

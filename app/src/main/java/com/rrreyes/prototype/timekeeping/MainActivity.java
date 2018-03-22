@@ -11,7 +11,10 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
@@ -35,6 +38,7 @@ import com.rrreyes.prototype.timekeeping.Constants.SharedData;
 import com.rrreyes.prototype.timekeeping.Dialogs.TKDialogs;
 import com.rrreyes.prototype.timekeeping.Models.DTRData;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -59,14 +63,17 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     MainLogAdapter MLAdapter;
 
     LocationManager locationManager;
-    LocationListener locationListener;
+    static LocationListener locationListener;
     double lng, lat;
+    int RetryCtr = 1;
+    int IdleCtr = 0;
 
     Handler handler, realmHandler;
     Runnable realmrun;
     boolean mStopHandler = false;
     boolean isInPremises = false;
     boolean isAutoTime = false;
+    boolean isLocationOn = false;
 
     List<DTRData> dataList = new ArrayList<>();
 
@@ -114,6 +121,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     void InitValues() {
         sd = new SharedData(this);
         isFirstRun = sd.GetFirstTime();
+        IdleCtr = 0;
 
         if (realm != null) {
             realm.close();
@@ -125,6 +133,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         realm = Realm.getDefaultInstance();
 
         Constants.InitCloudinary(this);
+
+        DeleteOldPictures();
     }
 
     void InitViews() {
@@ -151,6 +161,12 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         } else {
             LL_Screen.setVisibility(View.GONE);
             RunGPS();
+            InitGPS();
+            if(!(sd.GetCurrentLongitude() + sd.GetCurrentLatitude() == 0.0f) && isLocationOn) {
+                lat = sd.GetCurrentLatitude();
+                lng = sd.GetCurrentLongitude();
+                ComparePosition();
+            }
         }
 
         handler = new Handler();
@@ -189,8 +205,29 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                     ex.printStackTrace();
                 } finally {
                     if(isAutoTime && isInPremises) {
+                        /*Toast.makeText(getApplicationContext(), "LOC: (" + sd.GetLatitude() + ", " + sd.GetLongitude() + ") CURRENT: " +
+                                "(" + sd.GetCurrentLatitude() + ", " + sd.GetCurrentLongitude() + ")", Toast.LENGTH_SHORT).show();*/
+                        RetryCtr = 1;
                         LL_DeviceStatus.setBackgroundColor(getResources().getColor(R.color.tabTextColorB));
+                        sd.SetCurrentLongitude(lng);
+                        sd.SetCurrentLatitude(lat);
+                        if(IdleCtr % 60 == 0) {
+                            IdleCtr = 1;
+                            sd.SetCurrentLatitude(0.0f);
+                            sd.SetCurrentLongitude(0.0f);
+                            RunGPS();
+                            InitGPS();
+                        } else {
+                            IdleCtr++;
+                        }
                     } else {
+                        if(!isInPremises && (RetryCtr % 10 == 0)) {
+                            InitGPS();
+                            RetryCtr = 1;
+                        } else {
+                            RetryCtr++;
+                        }
+                        IdleCtr = 1;
                         LL_DeviceStatus.setBackgroundColor(getResources().getColor(R.color.tabTextColorA));
                     }
                 }
@@ -247,6 +284,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                     && (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)
                     && (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
                     && (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_CALENDAR) == PackageManager.PERMISSION_GRANTED)
+                    && (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
                     ) {
                 ShowSettings();
             }
@@ -308,41 +346,54 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         return cal.getTime();
     }
 
+    void ComparePosition() {
+        if((Math.abs(lat - sd.GetLatitude()) < 0.002) &&
+                (Math.abs(lng - sd.GetLongitude()) < 0.002)) {
+            isInPremises = true;
+            if(IdleCtr % 60 == 0) {
+                sd.SetCurrentLatitude(lat);
+                sd.SetCurrentLongitude(lng);
+                IdleCtr = 1;
+            }
+        } else {
+            isInPremises = false;
+            InitGPS();
+            RunGPS();
+        }
+    }
+
     void RunGPS() {
-        locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                lng = location.getLongitude();
-                lat = location.getLatitude();
-                if((sd.GetLatitude() == 0.0f) && (sd.GetLongitude() == 0.0f)) {
-                    sd.SetLatitude(lat);
-                    sd.SetLongitude(lng);
-                }
-                if((Math.abs(lat - sd.GetLatitude()) < 0.002) &&
-                        (Math.abs(lng - sd.GetLongitude()) < 0.002)) {
-                    isInPremises = true;
-                } else {
-                    isInPremises = false;
-                }
+        if(locationListener == null) {
+            locationListener = new LocationListener() {
+                @Override
+                public void onLocationChanged(Location location) {
+                    lng = location.getLongitude();
+                    lat = location.getLatitude();
+                    if((sd.GetLatitude() == 0.0f) && (sd.GetLongitude() == 0.0f)) {
+                        sd.SetLatitude(lat);
+                        sd.SetLongitude(lng);
+                    }
+                    ComparePosition();
                 /*Toast.makeText(getApplicationContext(), "(" + lat + ", " + lng + ") ===" +
                         "(" + sd.GetLatitude() + ", " + sd.GetLongitude() + ")", Toast.LENGTH_SHORT).show();*/
-            }
+                }
 
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
+                @Override
+                public void onStatusChanged(String provider, int status, Bundle extras) {
 
-            }
+                }
 
-            @Override
-            public void onProviderEnabled(String provider) {
-                InitGPS();
-            }
+                @Override
+                public void onProviderEnabled(String provider) {
+                    InitGPS();
+                }
 
-            @Override
-            public void onProviderDisabled(String provider) {
-                InitGPS();
-            }
-        };
+                @Override
+                public void onProviderDisabled(String provider) {
+                    InitGPS();
+                }
+            };
+        }
         InitGPS();
     }
 
@@ -351,12 +402,14 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         if(ContextCompat.checkSelfPermission(getApplicationContext(), "android.permission.ACCESS_FINE_LOCATION") == PackageManager.PERMISSION_GRANTED) {
             try {
                 if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                    isLocationOn = true;
                     locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, locationListener);
                     Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                     lat = location.getLatitude();
                     lng = location.getLongitude();
                 } else {
                     Toast.makeText(this, "GPS NOT ENABLED. TURN ON YOUR LOCATION", Toast.LENGTH_SHORT).show();
+                    isLocationOn = false;
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -415,6 +468,57 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 // Permission automatically granted on sdk<23 upon installation
                 Log.v(Constants.LOG_TAG, Constants.GRANTED);
             }
+        }
+    }
+
+    private void DeleteOldPictures() {
+        String dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/Timekeeping/";
+        List<DTRData> list = new ArrayList<>();
+        try {
+            realm.beginTransaction();
+            list = realm
+                    .where(DTRData.class)
+                    .findAll();
+            realm.commitTransaction();
+
+            if(list.size() > 3600) {
+                for(int i = 0; i < (list.size() - 3600); i++) {
+                    String file = dir + list.get(i).getBarcode() + "_" + list.get(i).getDate() + ".jpg";
+                    File image = new File(file);
+                    if(image.exists()) {
+                        if(image.delete()) {
+                            Log.i("==IMG=DEL==", "IMAGE DELETED");
+                        } else {
+                            Log.i("==IMG=DEL==", "IMAGE NOT DELETED");
+                        }
+                        try {
+                            image.getCanonicalFile().delete();
+                            if(image.exists()) {
+                                if(getApplicationContext().deleteFile(image.getName())) {
+                                    Log.i("==IMG=DEL==", "IMAGE DELETED");
+                                } else {
+                                    Log.i("==IMG=DEL==", "IMAGE NOT DELETED");
+                                }
+                            }
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        } finally {
+                            MediaScannerConnection.scanFile(
+                                    getApplicationContext(),
+                                    new String[]{file},
+                                    null,
+                                    new MediaScannerConnection.OnScanCompletedListener() {
+                                        @Override
+                                        public void onScanCompleted(String path, Uri uri) {
+                                            Log.i("==CAM==", "File Scanned and Deleted.");
+                                        }
+                                    });
+                        }
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 }

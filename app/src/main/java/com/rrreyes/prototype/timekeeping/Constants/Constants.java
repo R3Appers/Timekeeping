@@ -21,6 +21,9 @@ public class Constants {
     public static String KEY_TOKEN = "Token";
     public static String KEY_LONGITUDE = "Longitude";
     public static String KEY_LATITUDE = "Latitude";
+    public static String KEY_CURRENT_LONGITUDE = "CurrentLongitude";
+    public static String KEY_CURRENT_LATITUDE = "CurrentLatitude";
+    public static String KEY_LAST_SENT_DATA_COUNT = "LastSentDataCount";
 
     public static final String LOG_TAG = "==PERMISSION==";
     public static final String GRANTED = "Permission Granted!";

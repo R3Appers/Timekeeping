@@ -72,5 +72,27 @@ public class SharedData {
         sp.edit().putFloat(Constants.KEY_LATITUDE, (float)set).apply();
     }
 
+    public double GetCurrentLongitude() {
+        return sp.getFloat(Constants.KEY_CURRENT_LONGITUDE, 0.0f);
+    }
 
+    public void SetCurrentLongitude(double set) {
+        sp.edit().putFloat(Constants.KEY_CURRENT_LONGITUDE, (float)set).apply();
+    }
+
+    public double GetCurrentLatitude() {
+        return sp.getFloat(Constants.KEY_CURRENT_LATITUDE, 0.0f);
+    }
+
+    public void SetCurrentLatitude(double set) {
+        sp.edit().putFloat(Constants.KEY_CURRENT_LATITUDE, (float)set).apply();
+    }
+
+    public int GetLastDTRCount() {
+        return sp.getInt(Constants.KEY_LAST_SENT_DATA_COUNT, 0);
+    }
+
+    public void SetLastDTRCount(int set) {
+        sp.edit().putInt(Constants.KEY_LAST_SENT_DATA_COUNT, set).apply();
+    }
 }
