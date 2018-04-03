@@ -31,6 +31,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.rrreyes.prototype.timekeeping.Adapters.AutoDTRSync;
 import com.rrreyes.prototype.timekeeping.Adapters.DTRDataSorter;
 import com.rrreyes.prototype.timekeeping.Adapters.MainLogAdapter;
 import com.rrreyes.prototype.timekeeping.Constants.Constants;
@@ -62,8 +63,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     String currentViewDate = null;
     MainLogAdapter MLAdapter;
 
-    LocationManager locationManager;
-    static LocationListener locationListener;
+    /*LocationManager locationManager;
+    static LocationListener locationListener;*/
     double lng, lat;
     int RetryCtr = 1;
     int IdleCtr = 0;
@@ -73,11 +74,13 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     boolean mStopHandler = false;
     //boolean isInPremises = false;
     boolean isAutoTime = false;
-    boolean isLocationOn = false;
+    //boolean isLocationOn = false;
 
     List<DTRData> dataList = new ArrayList<>();
 
     Realm realm;
+
+    private static AutoDTRSync autoSync;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -167,6 +170,12 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 lng = sd.GetCurrentLongitude();
                 ComparePosition();
             }*/
+            if(autoSync == null) {
+                autoSync = AutoDTRSync.getInstance(this);
+                autoSync.RunAutoSync();
+            } else {
+                autoSync.RunAutoSync();
+            }
         }
 
         handler = new Handler();

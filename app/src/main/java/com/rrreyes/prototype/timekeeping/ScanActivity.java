@@ -154,6 +154,9 @@ public class ScanActivity extends AppCompatActivity {
                             Calendar calendar = Calendar.getInstance();
                             String currentDate = Constants.DATE_FORMAT.format(new Date());
                             String currentTime = Constants.TIME_FORMAT.format(calendar.getTime());
+                            /*if((TimeType == 4) && (GetHour(currentTime)) <= 6) {
+                                currentDate = GetYesterday(currentDate);
+                            }*/
                             employeeInfo = null;
 
                             try {
@@ -224,5 +227,20 @@ public class ScanActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    int GetHour(String time) {
+        return Integer.parseInt(time.substring(0, 2));
+    }
+
+    String GetYesterday(String currentViewDate) {
+        Calendar cal = Calendar.getInstance();
+        int year = Integer.parseInt(currentViewDate.substring(0, 4));
+        int month = Integer.parseInt(currentViewDate.substring(5, 7));
+        int day = Integer.parseInt(currentViewDate.substring(8, 10));
+        Log.e("==DT==", year + " - " + month + " - " + day);
+        cal.set(year, month - 1, day);
+        cal.add(Calendar.DATE, -1);
+        return Constants.DATE_FORMAT.format(cal.getTime());
     }
 }
