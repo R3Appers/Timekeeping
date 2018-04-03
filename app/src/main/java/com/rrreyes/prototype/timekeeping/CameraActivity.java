@@ -155,24 +155,39 @@ public class CameraActivity extends AppCompatActivity {
         for(int i = 1; i < 5; i++) {
             File image = new File(dir + mBarcode + "_" + GetYesterday(mDate) + "_" + i + ".jpg");
             if(processType.equals("4")) {
+                /*Log.e("***CC***",
+                        "Log: 4");*/
                 image = new File(dir + mBarcode + "_" + mDate + "_" + i + ".jpg");
             }
             if(image.exists()) {
+                /*Log.e("***CC***",
+                        "Log: Exist " + (i-1));*/
                 ImgPos[i - 1] = true;
             }
         }
         int ImgCtr = 0;
         int ImgPosition = 0;
-        for(int j = 0; 0 < ImgPos.length; j++) {
+        for(int j = 0; j < ImgPos.length; j++) {
             if(ImgPos[j]) {
                 ImgCtr++;
                 ImgPosition = j + 1;
+                /*Log.e("***CC***",
+                        "Log: Exist > Ctr: " + ImgCtr + " Position: " + ImgPosition);*/
             }
         }
         if(ImgCtr > 0) {
+            /*Log.e("***CC***",
+                    "Log: CanContinue");*/
             CanContinue = true;
         }
         if(CanContinue) {
+            /*Log.e("***CC***",
+                    "Log: " +
+                            ImgPos[0] + ", " +
+                            ImgPos[1] + ", " +
+                            ImgPos[2] + ", " +
+                            ImgPos[3] + ": " +
+                            ImgPosition);*/
             for (int i = 1; i < 5; i++) {
                 File image = new File(dir +
                         mBarcode + "_" +
