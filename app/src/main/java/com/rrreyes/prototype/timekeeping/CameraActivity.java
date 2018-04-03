@@ -84,9 +84,9 @@ public class CameraActivity extends AppCompatActivity {
         Button Btn_Camera = findViewById(R.id.Btn_Camera);
         Btn_Camera.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                filepath = dir + mBarcode + "_" + mDate + "_" + mType + ".png";
+                filepath = dir + mBarcode + "_" + mDate + "_" + mType + ".jpg";
                 if(mType.equals("4") && GetHour(mTime) <= 6) {
-                    filepath = dir + mBarcode + "_" + GetYesterday(mDate) + "_" + mType + ".png";
+                    filepath = dir + mBarcode + "_" + GetYesterday(mDate) + "_" + mType + ".jpg";
                 }
                 File newfile = new File(filepath);
                 try {
@@ -153,9 +153,9 @@ public class CameraActivity extends AppCompatActivity {
         boolean[] ImgPos = {false, false, false, false};
         boolean CanContinue = false;
         for(int i = 1; i < 5; i++) {
-            File image = new File(dir + mBarcode + "_" + GetYesterday(mDate) + "_" + i + ".png");
+            File image = new File(dir + mBarcode + "_" + GetYesterday(mDate) + "_" + i + ".jpg");
             if(processType.equals("4")) {
-                image = new File(dir + mBarcode + "_" + mDate + "_" + i + ".png");
+                image = new File(dir + mBarcode + "_" + mDate + "_" + i + ".jpg");
             }
             if(image.exists()) {
                 ImgPos[i - 1] = true;
@@ -177,20 +177,20 @@ public class CameraActivity extends AppCompatActivity {
                 File image = new File(dir +
                         mBarcode + "_" +
                         GetYesterday(mDate) + "_" +
-                        i + ".png");
+                        i + ".jpg");
                 File imageBackup = new File(dir +
                         mBarcode + "_" +
                         GetYesterday(mDate) + "_" +
-                        ImgPosition + ".png");
+                        ImgPosition + ".jpg");
                 if(processType.equals("4")) {
                     image = new File(dir +
                             mBarcode + "_" +
                             mDate + "_" +
-                            i + ".png");
+                            i + ".jpg");
                     imageBackup = new File(dir +
                             mBarcode + "_" +
                             mDate + "_" +
-                            ImgPosition + ".png");
+                            ImgPosition + ".jpg");
                 }
 
                 BitmapFactory.Options bmOptions;
@@ -272,7 +272,7 @@ public class CameraActivity extends AppCompatActivity {
         File image = new File(outFile);
         if(image.exists()) {
             for(int i = 0; i < 5; i++) {
-                File imgtemp = new File(dir + mBarcode + "_" + mDate + "_" + i + ".png");
+                File imgtemp = new File(dir + mBarcode + "_" + mDate + "_" + i + ".jpg");
                 if(imgtemp.exists()) {
                     if(imgtemp.delete()) {
                         Log.i("==IMG=DEL==", "IMAGE DELETED");
@@ -329,13 +329,15 @@ public class CameraActivity extends AppCompatActivity {
             tSync.setBarcode(data.getBarcode());
             tSync = GetTimeByType(tSync, data);
         }
-        String imgPath = new StringBuilder(dir)
-                .append(mBarcode)
-                .append("_")
-                .append(mDate)
-                .append(".jpg")
-                .toString();
-        tSync.setImageUrl(imgPath);
+        if(tSync.getBarcode() != null) {
+            String imgPath = new StringBuilder(dir)
+                    .append(mBarcode)
+                    .append("_")
+                    .append(mDate)
+                    .append(".jpg")
+                    .toString();
+            tSync.setImageUrl(imgPath);
+        }
         return tSync;
     }
 

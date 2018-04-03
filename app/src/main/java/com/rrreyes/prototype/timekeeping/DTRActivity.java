@@ -621,13 +621,13 @@ public class DTRActivity extends AppCompatActivity implements DatePickerDialog.O
             List<Bitmap> imgList = new ArrayList<>();
             try {
                 for(int i = 1; i < 5; i++) {
-                    File image = new File(dir + barcode + "_" + date + "_" + i + ".png");
+                    File image = new File(dir + barcode + "_" + date + "_" + i + ".jpg");
                     if(image.exists()) {
                         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
                         Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath(), bmOptions);
                         imgList.add(bitmap);
                     } else {
-                        image = new File(dir + barcode + "_" + date + "_" + 1 + ".png");
+                        image = new File(dir + barcode + "_" + date + "_" + 1 + ".jpg");
                         if(image.exists()) {
                             BitmapFactory.Options bmOptions = new BitmapFactory.Options();
                             Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath(), bmOptions);
@@ -637,7 +637,7 @@ public class DTRActivity extends AppCompatActivity implements DatePickerDialog.O
                                 imgList.add(CreateBlankImage(248, 248));
                             }
                         } else {
-                            image = new File(dir + barcode + "_" + date + "_" + 2 + ".png");
+                            image = new File(dir + barcode + "_" + date + "_" + 2 + ".jpg");
                             if(image.exists()) {
                                 BitmapFactory.Options bmOptions = new BitmapFactory.Options();
                                 Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath(), bmOptions);
@@ -647,7 +647,7 @@ public class DTRActivity extends AppCompatActivity implements DatePickerDialog.O
                                     imgList.add(CreateBlankImage(248, 248));
                                 }
                             } else {
-                                image = new File(dir + barcode + "_" + date + "_" + 3 + ".png");
+                                image = new File(dir + barcode + "_" + date + "_" + 3 + ".jpg");
                                 if(image.exists()) {
                                     BitmapFactory.Options bmOptions = new BitmapFactory.Options();
                                     Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath(), bmOptions);
@@ -657,7 +657,7 @@ public class DTRActivity extends AppCompatActivity implements DatePickerDialog.O
                                         imgList.add(CreateBlankImage(248, 248));
                                     }
                                 } else {
-                                    image = new File(dir + barcode + "_" + date + "_" + 4 + ".png");
+                                    image = new File(dir + barcode + "_" + date + "_" + 4 + ".jpg");
                                     if(image.exists()) {
                                         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
                                         Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath(), bmOptions);
@@ -737,7 +737,7 @@ public class DTRActivity extends AppCompatActivity implements DatePickerDialog.O
         File image = new File(outFile);
         if(image.exists()) {
             for(int i = 0; i < 5; i++) {
-                File imgtemp = new File(dir + mBarcode + "_" + mDate + "_" + i + ".png");
+                File imgtemp = new File(dir + mBarcode + "_" + mDate + "_" + i + ".jpg");
                 if(imgtemp.exists()) {
                     if(imgtemp.delete()) {
                         Log.i("==IMG=DEL==", "IMAGE DELETED");
