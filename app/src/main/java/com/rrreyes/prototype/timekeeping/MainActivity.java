@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
     Handler handler, realmHandler;
     Runnable realmrun;
     boolean mStopHandler = false;
-    boolean isInPremises = false;
+    //boolean isInPremises = false;
     boolean isAutoTime = false;
     boolean isLocationOn = false;
 
@@ -160,13 +160,13 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             Btn_TimeOut.setVisibility(View.INVISIBLE);
         } else {
             LL_Screen.setVisibility(View.GONE);
-            RunGPS();
+            /*RunGPS();
             InitGPS();
             if(!(sd.GetCurrentLongitude() + sd.GetCurrentLatitude() == 0.0f) && isLocationOn) {
                 lat = sd.GetCurrentLatitude();
                 lng = sd.GetCurrentLongitude();
                 ComparePosition();
-            }
+            }*/
         }
 
         handler = new Handler();
@@ -204,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 } finally {
-                    if(isAutoTime && isInPremises) {
+                    if(isAutoTime/* && isInPremises*/) {
                         /*Toast.makeText(getApplicationContext(), "LOC: (" + sd.GetLatitude() + ", " + sd.GetLongitude() + ") CURRENT: " +
                                 "(" + sd.GetCurrentLatitude() + ", " + sd.GetCurrentLongitude() + ")", Toast.LENGTH_SHORT).show();*/
                         RetryCtr = 1;
@@ -215,14 +215,14 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                             IdleCtr = 1;
                             sd.SetCurrentLatitude(0.0f);
                             sd.SetCurrentLongitude(0.0f);
-                            RunGPS();
-                            InitGPS();
+                            /*RunGPS();
+                            InitGPS();*/
                         } else {
                             IdleCtr++;
                         }
                     } else {
-                        if(!isInPremises && (RetryCtr % 10 == 0)) {
-                            InitGPS();
+                        if(/*!isInPremises &&*/ (RetryCtr % 10 == 0)) {
+                            /*InitGPS();*/
                             RetryCtr = 1;
                         } else {
                             RetryCtr++;
@@ -289,7 +289,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 ShowSettings();
             }
         } else {
-            if(isAutoTime && isInPremises) {
+            if(isAutoTime/* && isInPremises*/) {
                 Intent i = new Intent(this, ScanActivity.class);
                 if (view == Btn_TimeIn) {
                     i.putExtra(Constants.TIME_TYPE, 1);
@@ -308,12 +308,12 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 if(!isAutoTime) {
                     Toast.makeText(this, "Gallifreyan Error 001 : Please Contact an Admin", Toast.LENGTH_SHORT).show();
                 }
-                if(!isInPremises) {
+                /*if(!isInPremises) {
                     Toast.makeText(this, "Please Turn ON your Location and try again or Contact an Admin", Toast.LENGTH_SHORT).show();
-                    /*Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                    getApplicationContext().startActivity(myIntent);*/
+                    *//*Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    getApplicationContext().startActivity(myIntent);*//*
                     RunGPS();
-                }
+                }*/
             }
         }
     }
@@ -346,7 +346,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
         return cal.getTime();
     }
 
-    void ComparePosition() {
+    /*void ComparePosition() {
         if((Math.abs(lat - sd.GetLatitude()) < 0.002) &&
                 (Math.abs(lng - sd.GetLongitude()) < 0.002)) {
             isInPremises = true;
@@ -360,9 +360,9 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             InitGPS();
             RunGPS();
         }
-    }
+    }*/
 
-    void RunGPS() {
+    /*void RunGPS() {
         if(locationListener == null) {
             locationListener = new LocationListener() {
                 @Override
@@ -374,8 +374,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                         sd.SetLongitude(lng);
                     }
                     ComparePosition();
-                /*Toast.makeText(getApplicationContext(), "(" + lat + ", " + lng + ") ===" +
-                        "(" + sd.GetLatitude() + ", " + sd.GetLongitude() + ")", Toast.LENGTH_SHORT).show();*/
+                *//*Toast.makeText(getApplicationContext(), "(" + lat + ", " + lng + ") ===" +
+                        "(" + sd.GetLatitude() + ", " + sd.GetLongitude() + ")", Toast.LENGTH_SHORT).show();*//*
                 }
 
                 @Override
@@ -395,9 +395,9 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
             };
         }
         InitGPS();
-    }
+    }*/
 
-    void InitGPS() {
+    /*void InitGPS() {
         locationManager = (LocationManager)getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
         if(ContextCompat.checkSelfPermission(getApplicationContext(), "android.permission.ACCESS_FINE_LOCATION") == PackageManager.PERMISSION_GRANTED) {
             try {
@@ -428,7 +428,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 Log.v(Constants.LOG_TAG, Constants.GRANTED);
             }
         }
-    }
+    }*/
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {

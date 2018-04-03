@@ -406,8 +406,11 @@ public class DTRActivity extends AppCompatActivity implements DatePickerDialog.O
             DataCounter = 0;
             if(datas.size() != 0) {
                 sd.SetLastDTRCount(datas.size());
-                progressDialog.setMessage("Please Wait. Sending: " + DataCounter + "/"+ datas.size());
+                progressDialog.setMessage("Please Wait. Sending Data");
+                progressDialog.setProgress(DataCounter);
+                progressDialog.setMax(datas.size());
                 progressDialog.show();
+                logs = new ArrayList<>();
                 logs.clear();
                 for(int a = 0; a < datas.size(); a++) {
                     service.sendDTR(
@@ -425,10 +428,26 @@ public class DTRActivity extends AppCompatActivity implements DatePickerDialog.O
                                 public void onResponse(Call<BasicResponse> call, Response<BasicResponse> response) {
                                     DataCounter++;
                                     if(DataCounter >= datas.size() - 1) {
+                                        progressDialog.dismiss();
+                                        progressDialog.setMessage("Sending Complete");
+                                        progressDialog.setProgress(DataCounter);
+                                        progressDialog.setMax(datas.size());
+                                        progressDialog.show();
+                                        if(response.body() != null) {
+                                            DTRLogV2 log = new DTRLogV2();
+                                            log.setDate(response.body().getDate());
+                                            log.setBarcode(response.body().getBarcode());
+                                            log.setStatus("OK");
+                                            logs.add(log);
+                                        }
                                         FinishedSending(response);
                                         progressDialog.dismiss();
                                     } else {
-                                        progressDialog.setMessage("Please Wait. Sending: " + DataCounter + "/"+ datas.size());
+                                        progressDialog.dismiss();
+                                        progressDialog.setMessage("Please Wait. Sending Data");
+                                        progressDialog.setProgress(DataCounter);
+                                        progressDialog.setMax(datas.size());
+                                        progressDialog.show();
                                         if(response.body() != null) {
                                             DTRLogV2 log = new DTRLogV2();
                                             log.setDate(response.body().getDate());
@@ -441,7 +460,43 @@ public class DTRActivity extends AppCompatActivity implements DatePickerDialog.O
 
                                 @Override
                                 public void onFailure(Call<BasicResponse> call, Throwable t) {
-
+                                    DataCounter++;
+                                    BasicResponse response = null;
+                                    try {
+                                        response = call.execute().body();
+                                    } catch (Exception ex) {
+                                        ex.printStackTrace();
+                                    } finally {
+                                        if(DataCounter >= datas.size() - 1) {
+                                            progressDialog.dismiss();
+                                            progressDialog.setMessage("Sending Complete");
+                                            progressDialog.setProgress(DataCounter);
+                                            progressDialog.setMax(datas.size());
+                                            progressDialog.show();
+                                            if(response != null) {
+                                                DTRLogV2 log = new DTRLogV2();
+                                                log.setDate(response.getDate());
+                                                log.setBarcode(response.getBarcode());
+                                                log.setStatus("ERROR: RESEND");
+                                                logs.add(log);
+                                            }
+                                            FinishedSending(response);
+                                            progressDialog.dismiss();
+                                        } else {
+                                            progressDialog.dismiss();
+                                            progressDialog.setMessage("Please Wait. Sending Data");
+                                            progressDialog.setProgress(DataCounter);
+                                            progressDialog.setMax(datas.size());
+                                            progressDialog.show();
+                                            if(response != null) {
+                                                DTRLogV2 log = new DTRLogV2();
+                                                log.setDate(response.getDate());
+                                                log.setBarcode(response.getBarcode());
+                                                log.setStatus("ERROR: RESEND");
+                                                logs.add(log);
+                                            }
+                                        }
+                                    }
                                 }
                             });
                 }
@@ -542,6 +597,8 @@ public class DTRActivity extends AppCompatActivity implements DatePickerDialog.O
                 String pid = new StringBuilder(sd.GetCompanyID())
                         .append("/")
                         .append(sd.GetCompanyID())
+                        .append("/")
+                        .append(sd.GetUserID())
                         .append("/")
                         .append(date)
                         .toString();
@@ -747,6 +804,27 @@ public class DTRActivity extends AppCompatActivity implements DatePickerDialog.O
             }
         } else {
             Log.e("==RTGSError==", "No Response: " + response.raw().message());
+        }
+    }
+
+    private void FinishedSending(BasicResponse response) {
+        BasicResponse basicResponse = response;
+        Btn_Send.setEnabled(true);
+        Btn_Send.setText(R.string.senddtr);
+        if(response != null) {
+            basicResponse = response;
+        }
+        if(basicResponse != null) {
+            if(basicResponse.getCode() == 200) {
+                ProcessLogs();
+                Toast.makeText(thisActivity, Constants.SUCCESS_SYNC, Toast.LENGTH_LONG).show();
+                Intent i = new Intent(thisActivity, MainActivity.class);
+                startActivity(i);
+            } else {
+                Log.e("==RTGSError==", "Code Error: " + basicResponse.getCode());
+            }
+        } else {
+            Log.e("==RTGSError==", "No Response: 404");
         }
     }
 

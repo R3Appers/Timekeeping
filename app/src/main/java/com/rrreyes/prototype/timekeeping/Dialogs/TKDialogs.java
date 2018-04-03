@@ -63,6 +63,7 @@ public class TKDialogs {
     private EditText Username;
     private EditText Password;
     private Button Btn_Submit;
+    private Button Btn_Cancel;
 
     private LocationManager locationManager;
     double lng, lat;
@@ -103,6 +104,7 @@ public class TKDialogs {
         Username = dialog.findViewById(R.id.Username);
         Password = dialog.findViewById(R.id.Password);
         Btn_Submit = dialog.findViewById(R.id.Btn_Submit);
+        Btn_Cancel = dialog.findViewById(R.id.Btn_Cancel);
         TV_Version = dialog.findViewById(R.id.TV_Version);
 
         TV_Version.setText(BuildConfig.VERSION_NAME);
@@ -150,6 +152,12 @@ public class TKDialogs {
                         Log.e(Constants.DENIED, t.getMessage());
                     }
                 });
+            }
+        });
+        Btn_Cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
             }
         });
 
@@ -465,7 +473,7 @@ public class TKDialogs {
                     lat = location.getLatitude();
                     lng = location.getLongitude();
                 } else {
-                    Toast.makeText(context, "GPS NOT ENABLED. TURN ON YOUR LOCATION", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(context, "GPS NOT ENABLED. TURN ON YOUR LOCATION", Toast.LENGTH_SHORT).show();
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();

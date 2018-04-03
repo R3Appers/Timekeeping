@@ -9,6 +9,7 @@
     <string name="branchid">Branch ID</string>
     <string name="syncdata">Sync Data</string>
     <string name="login">Login</string>
+    <string name="cancel">Cancel</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
     <string name="setup">Setup</string>
