@@ -29,10 +29,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
@@ -50,6 +52,8 @@ public class CameraActivity extends AppCompatActivity {
     String filepath;
 
     Realm realm;
+
+    int dayDepth = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -332,7 +336,17 @@ public class CameraActivity extends AppCompatActivity {
                         .equalTo("Date", mDate)
                         .endGroup()
                         .findAll();
-        AutoDTRSync.AddDataToSync(ProcessDTR(tempDatas, mBarcode, mDate));
+        if(tempDatas.size() != 0) {
+            dayDepth = 0;
+            AutoDTRSync.AddDataToSync(ProcessDTR(tempDatas, mBarcode, mDate));
+        } else {
+            dayDepth++;
+            if(dayDepth >= 7) {
+                dayDepth = 0;
+            } else {
+                AddToAutoSync(mBarcode, GetYesterday(mDate));
+            }
+        }
     }
 
     private DTRDataSyncV2 ProcessDTR(List<DTRData> tempDatas, String mBarcode, String mDate) {
@@ -412,5 +426,18 @@ public class CameraActivity extends AppCompatActivity {
         cal.set(year, month - 1, day);
         cal.add(Calendar.DATE, -1);
         return Constants.DATE_FORMAT.format(cal.getTime());
+    }
+
+    boolean IsMonday(String date) {
+        String weekDay;
+        SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", Locale.US);
+        Calendar cal = Calendar.getInstance();
+        int year = Integer.parseInt(date.substring(0, 4));
+        int month = Integer.parseInt(date.substring(5, 7));
+        int day = Integer.parseInt(date.substring(8, 10));
+        Log.e("==DT==", year + " - " + month + " - " + day);
+        cal.set(year, month - 1, day);
+        weekDay = dayFormat.format(cal.getTime());
+        return weekDay.equals("Monday");
     }
 }

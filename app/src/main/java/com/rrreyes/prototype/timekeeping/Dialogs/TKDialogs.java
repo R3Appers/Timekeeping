@@ -26,6 +26,7 @@ import com.rrreyes.prototype.timekeeping.Constants.Constants;
 import com.rrreyes.prototype.timekeeping.Constants.RetrofitData;
 import com.rrreyes.prototype.timekeeping.Constants.SharedData;
 import com.rrreyes.prototype.timekeeping.DTRActivity;
+import com.rrreyes.prototype.timekeeping.DataManagerActivity;
 import com.rrreyes.prototype.timekeeping.Interfaces.TKService;
 import com.rrreyes.prototype.timekeeping.MainActivity;
 import com.rrreyes.prototype.timekeeping.Models.Employee;
@@ -71,6 +72,7 @@ public class TKDialogs {
     EditText EmpIDN;
     Button Btn_SyncData;
     Button Btn_SendDTR;
+    Button Btn_ImportExport;
     Button Btn_Logout;
     Button Btn_ClockIn;
     Button Btn_Confirm;
@@ -170,6 +172,7 @@ public class TKDialogs {
         dialog.setCancelable(true);
         Btn_SyncData = dialog.findViewById(R.id.Btn_SyncData);
         Btn_SendDTR = dialog.findViewById(R.id.Btn_SendDTR);
+        Btn_ImportExport = dialog.findViewById(R.id.Btn_ImportExport);
         Btn_Logout = dialog.findViewById(R.id.Btn_Logout);
         TV_RegisteredLocation = dialog.findViewById(R.id.TV_RegisteredLocation);
 
@@ -294,6 +297,13 @@ public class TKDialogs {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(context, DTRActivity.class);
+                context.startActivity(i);
+            }
+        });
+        Btn_ImportExport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(context, DataManagerActivity.class);
                 context.startActivity(i);
             }
         });

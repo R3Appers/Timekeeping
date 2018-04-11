@@ -63,6 +63,17 @@
             android:background="@color/colorPrimaryDark"/>
 
         <Button
+            android:id="@+id/Btn_ImportExport"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/importExport"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorWhite"
+            android:background="@color/colorPrimaryDark"/>
+
+        <Button
             android:id="@+id/Btn_Logout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
