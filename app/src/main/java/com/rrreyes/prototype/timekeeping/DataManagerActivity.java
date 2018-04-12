@@ -73,8 +73,6 @@ public class DataManagerActivity extends AppCompatActivity implements DatePicker
 
     private SharedData sd;
 
-    List<DTRDataSyncV2> datas = new ArrayList<>();
-
     ProgressDialog progressDialog;
 
     int StartDate = 0;
@@ -87,7 +85,7 @@ public class DataManagerActivity extends AppCompatActivity implements DatePicker
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_dtr);
+        setContentView(R.layout.activity_data_manager);
 
         Init();
         InitViews();
@@ -146,7 +144,7 @@ public class DataManagerActivity extends AppCompatActivity implements DatePicker
                     }
                 } else {
                     Btn_Import.setEnabled(true);
-                    Btn_Import.setText(R.string.exportData);
+                    Btn_Import.setText(R.string.importData);
                 }
             }
         });
@@ -163,8 +161,11 @@ public class DataManagerActivity extends AppCompatActivity implements DatePicker
         try {
             progressDialog = new ProgressDialog(this);
 
-            realm.beginTransaction();
-            datas = new ArrayList<>();
+            if(realm.isClosed()) {
+                realm.beginTransaction();
+            }
+
+            List<DTRData> datas = new ArrayList<>();
 
             for(int i = StartDate; i <= EndDate; i++) {
                 int temp = i % 100;
@@ -194,8 +195,9 @@ public class DataManagerActivity extends AppCompatActivity implements DatePicker
                                                 + "-"
                                                 + String.format(Locale.US,"%02d", (i % 100)))
                                 .findAll();
-                ExportDTR(tempDatas);
+                datas.addAll(tempDatas);
             }
+            ExportDTR(datas);
             realm.commitTransaction();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -203,31 +205,51 @@ public class DataManagerActivity extends AppCompatActivity implements DatePicker
     }
 
     void ExportDTR(List<DTRData> data) throws IOException {
-        String filepath = dir +
-                sd.GetCompanyID() + "-" +
-                sd.GetUserID() + "_" +
-                Btn_StartDate.getText() + "_" +
-                Btn_EndDate.getText() + ".csv";
-        File f = new File(filepath);
-        CSVWriter writer;
-        // File exist
-        if(f.exists() && !f.isDirectory()){
-            FileWriter mFileWriter = new FileWriter(filepath, true);
-            writer = new CSVWriter(mFileWriter);
+        if(data.size() > 0) {
+            String filepath = dir +
+                    sd.GetCompanyID() + "-" +
+                    sd.GetUserID() + "_" +
+                    Btn_StartDate.getText() + "_" +
+                    Btn_EndDate.getText() + ".csv";
+            File f = new File(filepath);
+            f.createNewFile();
+            CSVWriter writer;
+            MediaScannerConnection.scanFile(
+                    getApplicationContext(),
+                    new String[]{filepath},
+                    null,
+                    new MediaScannerConnection.OnScanCompletedListener() {
+                        @Override
+                        public void onScanCompleted(String path, Uri uri) {
+                            Log.i("==CSV==", "File Created and Scanned.");
+                        }
+                    });
+            // File exist
+            if(f.exists() && !f.isDirectory()){
+                writer = new CSVWriter(new FileWriter(f));
+            } else {
+                f.createNewFile();
+                writer = new CSVWriter(new FileWriter(f));
+            }
+            for(int i = 0; i < data.size(); i++) {
+                String[] line = {
+                        data.get(i).getDate(),
+                        data.get(i).getBarcode(),
+                        data.get(i).getName(),
+                        data.get(i).getType(),
+                        data.get(i).getTime()
+                };
+                writer.writeNext(line);
+            }
+            writer.close();
+
+            Btn_Export.setEnabled(true);
+            Btn_Export.setText(R.string.exportData);
+
+            Toast.makeText(getApplicationContext(), "Export Complete", Toast.LENGTH_SHORT).show();
         } else {
-            writer = new CSVWriter(new FileWriter(filepath));
+            Toast.makeText(getApplicationContext(), "No Data Found", Toast.LENGTH_SHORT).show();
         }
-        for(int i = 0; i < data.size(); i++) {
-            String[] line = {
-                    data.get(i).getDate(),
-                    data.get(i).getBarcode(),
-                    data.get(i).getName(),
-                    data.get(i).getType(),
-                    data.get(i).getTime()
-            };
-            writer.writeNext(line);
-        }
-        writer.close();
     }
 
     void ImportDTR() throws IOException {
@@ -236,24 +258,34 @@ public class DataManagerActivity extends AppCompatActivity implements DatePicker
                 sd.GetUserID() + "_" +
                 Btn_StartDate.getText() + "_" +
                 Btn_EndDate.getText() + ".csv";
-        CSVReader reader = new CSVReader(new FileReader(filepath));
-        String[] nextLine;
-        realm.beginTransaction();
-        while ((nextLine = reader.readNext()) != null) {
-            DTRData data = new DTRData();
-            data.setDate(nextLine[0]);
-            data.setBarcode(nextLine[1]);
-            data.setName(nextLine[2]);
-            data.setType(nextLine[3]);
-            data.setTime(nextLine[4]);
-            try {
-                realm.copyToRealm(data);
-                realm.commitTransaction();
-            } catch (Exception ex) {
-                ex.printStackTrace();
+        File file = new File(filepath);
+        if(file.exists()) {
+            FileReader fileReader = new FileReader(filepath);
+            CSVReader reader = new CSVReader(fileReader);
+            String[] nextLine;
+            while ((nextLine = reader.readNext()) != null) {
+                try {
+                    realm.beginTransaction();
+                    DTRData data = new DTRData();
+                    data.setDate(nextLine[0]);
+                    data.setBarcode(nextLine[1]);
+                    data.setName(nextLine[2]);
+                    data.setType(nextLine[3]);
+                    data.setTime(nextLine[4]);
+                    realm.copyToRealm(data);
+                    realm.commitTransaction();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
+
+            Btn_Import.setEnabled(true);
+            Btn_Import.setText(R.string.importData);
+
+            Toast.makeText(getApplicationContext(), "Import Complete", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getApplicationContext(), "No Data Found", Toast.LENGTH_SHORT).show();
         }
-        realm.close();
     }
 
     public void DatePicker(View view){
