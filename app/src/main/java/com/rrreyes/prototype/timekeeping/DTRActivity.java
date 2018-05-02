@@ -15,6 +15,7 @@ import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
@@ -425,20 +426,25 @@ public class DTRActivity extends AppCompatActivity implements DatePickerDialog.O
                             datas.get(a).getImageUrl())
                             .enqueue(new Callback<BasicResponse>() {
                                 @Override
-                                public void onResponse(Call<BasicResponse> call, Response<BasicResponse> response) {
+                                public void onResponse(@NonNull Call<BasicResponse> call, @NonNull Response<BasicResponse> response) {
                                     DataCounter++;
+                                    BasicResponse brData = response.body();
+                                    DTRLogV2 log = new DTRLogV2();
                                     if(DataCounter >= datas.size() - 1) {
                                         progressDialog.dismiss();
                                         progressDialog.setMessage("Sending Complete");
                                         progressDialog.setProgress(DataCounter);
                                         progressDialog.setMax(datas.size());
                                         progressDialog.show();
-                                        if(response.body() != null) {
-                                            DTRLogV2 log = new DTRLogV2();
-                                            log.setDate(response.body().getDate());
-                                            log.setBarcode(response.body().getBarcode());
+                                        if(brData != null) {
+                                            log.setDate(brData.getDate());
+                                            log.setBarcode(brData.getBarcode());
                                             log.setStatus("OK");
                                             logs.add(log);
+                                        } else {
+                                            log.setDate("");
+                                            log.setBarcode("");
+                                            log.setStatus("Null Data");
                                         }
                                         FinishedSending(response);
                                         progressDialog.dismiss();
@@ -448,20 +454,24 @@ public class DTRActivity extends AppCompatActivity implements DatePickerDialog.O
                                         progressDialog.setProgress(DataCounter);
                                         progressDialog.setMax(datas.size());
                                         progressDialog.show();
-                                        if(response.body() != null) {
-                                            DTRLogV2 log = new DTRLogV2();
-                                            log.setDate(response.body().getDate());
-                                            log.setBarcode(response.body().getBarcode());
+                                        if(brData != null) {
+                                            log.setDate(brData.getDate());
+                                            log.setBarcode(brData.getBarcode());
                                             log.setStatus("OK");
                                             logs.add(log);
+                                        } else {
+                                            log.setDate("");
+                                            log.setBarcode("");
+                                            log.setStatus("Null Data");
                                         }
                                     }
                                 }
 
                                 @Override
-                                public void onFailure(Call<BasicResponse> call, Throwable t) {
+                                public void onFailure(@NonNull Call<BasicResponse> call, @NonNull Throwable t) {
                                     DataCounter++;
                                     BasicResponse response = null;
+                                    DTRLogV2 log = new DTRLogV2();
                                     try {
                                         response = call.execute().body();
                                     } catch (Exception ex) {
@@ -474,11 +484,14 @@ public class DTRActivity extends AppCompatActivity implements DatePickerDialog.O
                                             progressDialog.setMax(datas.size());
                                             progressDialog.show();
                                             if(response != null) {
-                                                DTRLogV2 log = new DTRLogV2();
                                                 log.setDate(response.getDate());
                                                 log.setBarcode(response.getBarcode());
                                                 log.setStatus("ERROR: RESEND");
                                                 logs.add(log);
+                                            } else {
+                                                log.setDate("");
+                                                log.setBarcode("");
+                                                log.setStatus("Null Data : RESEND");
                                             }
                                             FinishedSending(response);
                                             progressDialog.dismiss();
@@ -489,11 +502,14 @@ public class DTRActivity extends AppCompatActivity implements DatePickerDialog.O
                                             progressDialog.setMax(datas.size());
                                             progressDialog.show();
                                             if(response != null) {
-                                                DTRLogV2 log = new DTRLogV2();
                                                 log.setDate(response.getDate());
                                                 log.setBarcode(response.getBarcode());
                                                 log.setStatus("ERROR: RESEND");
                                                 logs.add(log);
+                                            } else {
+                                                log.setDate("");
+                                                log.setBarcode("");
+                                                log.setStatus("Null Data : RESEND");
                                             }
                                         }
                                     }
